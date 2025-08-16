@@ -19,8 +19,8 @@ public class PlayerHealth : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        // Trap or Beam deals damage
-        if (collision.gameObject.CompareTag("Trap") || collision.gameObject.CompareTag("Beam"))
+        
+        if (collision.gameObject.CompareTag("Trap") || collision.gameObject.CompareTag("Beam") || collision.gameObject.CompareTag("Wrecking Ball"))
         {
             TakeDamage(1);
         }
