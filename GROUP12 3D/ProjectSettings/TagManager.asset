@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Beam
   - canPickUp
+  - Trap
   layers:
   - Default
   - TransparentFX
