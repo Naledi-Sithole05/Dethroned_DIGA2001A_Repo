@@ -1,25 +1,17 @@
- using System.Collections;
+  using System.Collections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.Events;
 
-[System.Serializable]
 public class Dialogue : MonoBehaviour
 {
     [Header("UI References")]
-    [Tooltip("Assign the TextMeshProUGUI component for dialogue text")]
     public TextMeshProUGUI textComponent;
-    
-    [Tooltip("Optional panel to toggle visibility")]
     public GameObject dialoguePanel;
 
     [Header("Dialogue Settings")]
-    [TextArea(3, 10)]
-    public string[] lines;
-    
-    [Range(0.001f, 0.1f)]
+    [TextArea(3, 10)] public string[] lines;
     public float textSpeed = 0.05f;
-    
     public bool allowMouseSkip = true;
     public KeyCode advanceKey = KeyCode.Space;
 
@@ -45,41 +37,30 @@ public class Dialogue : MonoBehaviour
         }
     }
 
-    #region Setup Methods
+    #region Setup
     private void ValidateReferences()
     {
         if (textComponent == null)
         {
             textComponent = GetComponentInChildren<TextMeshProUGUI>();
             if (textComponent == null)
-            {
                 Debug.LogError("No TextMeshProUGUI component found!", this);
-                enabled = false;
-                return;
-            }
-        }
-
-        if (lines == null || lines.Length == 0)
-        {
-            Debug.LogWarning("Dialogue lines array is empty!", this);
         }
 
         if (dialoguePanel == null)
-        {
             dialoguePanel = gameObject;
-        }
     }
 
     private void InitializeDialogue()
     {
         textComponent.text = string.Empty;
-        ToggleDialoguePanel(true);
+        SetDialogueActive(true);
         SafeInvoke(onDialogueStart);
         StartDialogue();
     }
     #endregion
 
-    #region Input Handling
+    #region Input
     private bool CanAdvanceDialogue()
     {
         return Input.GetKeyDown(advanceKey) || 
@@ -89,13 +70,9 @@ public class Dialogue : MonoBehaviour
     private void HandleInput()
     {
         if (isTyping)
-        {
-            SkipTyping();
-        }
+            SkipToEnd();
         else
-        {
             NextLine();
-        }
     }
     #endregion
 
@@ -120,12 +97,11 @@ public class Dialogue : MonoBehaviour
         isTyping = false;
     }
 
-    private void SkipTyping()
+    private void SkipToEnd()
     {
         if (typingCoroutine != null)
-        {
             StopCoroutine(typingCoroutine);
-        }
+
         textComponent.text = lines[index];
         isTyping = false;
     }
@@ -145,37 +121,48 @@ public class Dialogue : MonoBehaviour
 
     public void EndDialogue()
     {
-        ToggleDialoguePanel(false);
+        SetDialogueActive(false);
         SafeInvoke(onDialogueEnd);
     }
     #endregion
 
-    #region Utility Methods
-    private void ToggleDialoguePanel(bool state)
+    #region Utilities
+    private void SetDialogueActive(bool state)
     {
         if (dialoguePanel != null)
-        {
             dialoguePanel.SetActive(state);
-        }
     }
 
+    // Completely safe event invocation
     private void SafeInvoke(UnityEvent unityEvent)
     {
+        if (unityEvent == null) return;
+
         try
         {
-            if (unityEvent != null && unityEvent.GetPersistentEventCount() > 0)
+            // Only invoke if there are persistent listeners
+            if (unityEvent.GetPersistentEventCount() > 0)
             {
                 unityEvent.Invoke();
+            }
+            else
+            {
+                // For runtime-added listeners
+                var method = unityEvent.GetType().GetMethod("GetDelegateCount");
+                if (method != null && (int)method.Invoke(unityEvent, null) > 0)
+                {
+                    unityEvent.Invoke();
+                }
             }
         }
         catch (System.Exception e)
         {
-            Debug.LogWarning($"Event invocation failed: {e.Message}", this);
+            Debug.LogWarning($"Event invocation failed: {e.Message}");
         }
     }
     #endregion
 
-    #region Public Methods
+    #region Public API
     public void SetLines(string[] newLines)
     {
         lines = newLines;
@@ -185,7 +172,7 @@ public class Dialogue : MonoBehaviour
 
     public void ForceEndDialogue()
     {
-        SkipTyping();
+        SkipToEnd();
         EndDialogue();
     }
     #endregion

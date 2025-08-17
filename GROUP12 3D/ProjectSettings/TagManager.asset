@@ -8,6 +8,7 @@ TagManager:
   - canPickUp
   - Trap
   - Wrecking Ball
+  - OnPickUp
   layers:
   - Default
   - TransparentFX
