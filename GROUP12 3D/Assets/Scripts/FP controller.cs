@@ -16,7 +16,7 @@ public class FPcontroller : MonoBehaviour
     public Transform cameraTransform;
     public float lookSensitivity = 2f;
     public float verticalLookLimit = 90f;
-    public float horizontalLookLimit = 60f;
+    
 
     private CharacterController controller;
     private Vector2 moveInput;
@@ -67,17 +67,17 @@ public class FPcontroller : MonoBehaviour
         controller.Move((velocity + jumpVelocity) * Time.deltaTime);
     }
 
-    public void HandleLook()
+   public void HandleLook()
     {
         float mouseX = lookInput.x * lookSensitivity;
         float mouseY = lookInput.y * lookSensitivity;
 
-        verticalRotation -= mouseY;
+       verticalRotation -= mouseY;
         verticalRotation = Mathf.Clamp(verticalRotation, -verticalLookLimit, verticalLookLimit);
 
         cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
         transform.Rotate(Vector3.up * mouseX);
-    }
+   }
 
     public void OnJump(InputAction.CallbackContext context)
     {
