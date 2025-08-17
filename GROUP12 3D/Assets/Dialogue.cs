@@ -1,17 +1,25 @@
- using System.Collections; // Required for IEnumerator
+ using System.Collections;
 using UnityEngine;
 using TMPro;
 using UnityEngine.Events;
 
+[System.Serializable]
 public class Dialogue : MonoBehaviour
 {
     [Header("UI References")]
-    public TextMeshProUGUI textComponent; // Assign in Inspector
-    public GameObject dialoguePanel; // Optional: for hiding/showing panel
+    [Tooltip("Assign the TextMeshProUGUI component for dialogue text")]
+    public TextMeshProUGUI textComponent;
+    
+    [Tooltip("Optional panel to toggle visibility")]
+    public GameObject dialoguePanel;
 
     [Header("Dialogue Settings")]
-    [TextArea(3, 10)] public string[] lines; // Multi-line text fields
+    [TextArea(3, 10)]
+    public string[] lines;
+    
+    [Range(0.001f, 0.1f)]
     public float textSpeed = 0.05f;
+    
     public bool allowMouseSkip = true;
     public KeyCode advanceKey = KeyCode.Space;
 
@@ -21,6 +29,7 @@ public class Dialogue : MonoBehaviour
 
     private int index;
     private bool isTyping;
+    private Coroutine typingCoroutine;
 
     void Start()
     {
@@ -36,56 +45,68 @@ public class Dialogue : MonoBehaviour
         }
     }
 
-    // ===== SETUP METHODS =====
+    #region Setup Methods
     private void ValidateReferences()
     {
         if (textComponent == null)
         {
-            Debug.LogError("TextComponent not assigned in Dialogue script!", this);
-            enabled = false;
+            textComponent = GetComponentInChildren<TextMeshProUGUI>();
+            if (textComponent == null)
+            {
+                Debug.LogError("No TextMeshProUGUI component found!", this);
+                enabled = false;
+                return;
+            }
         }
 
         if (lines == null || lines.Length == 0)
         {
-            Debug.LogWarning("No dialogue lines assigned!", this);
+            Debug.LogWarning("Dialogue lines array is empty!", this);
+        }
+
+        if (dialoguePanel == null)
+        {
+            dialoguePanel = gameObject;
         }
     }
 
     private void InitializeDialogue()
     {
         textComponent.text = string.Empty;
-        if (dialoguePanel != null) dialoguePanel.SetActive(true);
-        onDialogueStart?.Invoke();
+        ToggleDialoguePanel(true);
+        SafeInvoke(onDialogueStart);
         StartDialogue();
     }
+    #endregion
 
-    // ===== INPUT HANDLING =====
+    #region Input Handling
     private bool CanAdvanceDialogue()
     {
-        return !isTyping || (allowMouseSkip && Input.GetMouseButtonDown(0)) || Input.GetKeyDown(advanceKey);
+        return Input.GetKeyDown(advanceKey) || 
+               (allowMouseSkip && Input.GetMouseButtonDown(0));
     }
 
     private void HandleInput()
     {
-        if (textComponent.text == lines[index])
+        if (isTyping)
         {
-            NextLine();
+            SkipTyping();
         }
         else
         {
-            StopAllCoroutines();
-            textComponent.text = lines[index];
+            NextLine();
         }
     }
+    #endregion
 
-    // ===== DIALOGUE FLOW =====
+    #region Dialogue Flow
     public void StartDialogue()
     {
         index = 0;
-        StartCoroutine(TypeLine());
+        typingCoroutine = StartCoroutine(TypeLine());
     }
 
-    IEnumerator TypeLine()
+    private IEnumerator TypeLine()
     {
         isTyping = true;
         textComponent.text = string.Empty;
@@ -99,12 +120,22 @@ public class Dialogue : MonoBehaviour
         isTyping = false;
     }
 
-    void NextLine()
+    private void SkipTyping()
+    {
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+        }
+        textComponent.text = lines[index];
+        isTyping = false;
+    }
+
+    public void NextLine()
     {
         if (index < lines.Length - 1)
         {
             index++;
-            StartCoroutine(TypeLine());
+            typingCoroutine = StartCoroutine(TypeLine());
         }
         else
         {
@@ -112,24 +143,50 @@ public class Dialogue : MonoBehaviour
         }
     }
 
-    void EndDialogue()
+    public void EndDialogue()
     {
-        if (dialoguePanel != null) dialoguePanel.SetActive(false);
-        onDialogueEnd?.Invoke();
+        ToggleDialoguePanel(false);
+        SafeInvoke(onDialogueEnd);
+    }
+    #endregion
+
+    #region Utility Methods
+    private void ToggleDialoguePanel(bool state)
+    {
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(state);
+        }
     }
 
-    // ===== PUBLIC METHODS =====
-    public void SkipToEnd()
+    private void SafeInvoke(UnityEvent unityEvent)
     {
-        StopAllCoroutines();
-        textComponent.text = lines[index];
-        isTyping = false;
+        try
+        {
+            if (unityEvent != null && unityEvent.GetPersistentEventCount() > 0)
+            {
+                unityEvent.Invoke();
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"Event invocation failed: {e.Message}", this);
+        }
     }
+    #endregion
 
+    #region Public Methods
     public void SetLines(string[] newLines)
     {
         lines = newLines;
         index = 0;
         StartDialogue();
     }
+
+    public void ForceEndDialogue()
+    {
+        SkipTyping();
+        EndDialogue();
+    }
+    #endregion
 }
