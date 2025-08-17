@@ -16,6 +16,7 @@ public class FPcontroller : MonoBehaviour
     public Transform cameraTransform;
     public float lookSensitivity = 2f;
     public float verticalLookLimit = 90f;
+    public float horizontalLookLimit = 60f;
 
     private CharacterController controller;
     private Vector2 moveInput;
