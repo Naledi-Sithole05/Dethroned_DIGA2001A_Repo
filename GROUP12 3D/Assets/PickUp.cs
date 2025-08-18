@@ -1,9 +1,11 @@
  using UnityEngine;
+using UnityEngine.SceneManagement; // Add this line
 
 public class PickUpCrown : MonoBehaviour
 {
-    public GameObject pickUpText; // The "Press E" UI prompt
-    public GameObject CrownOnPlayer; // The crown that appears on the player when picked up
+    public GameObject pickUpText;
+    public GameObject CrownOnPlayer;
+    public string nextSceneName = "Level2"; // Set default or assign in Inspector
 
     void Start()
     {
@@ -16,12 +18,14 @@ public class PickUpCrown : MonoBehaviour
         {
             pickUpText.SetActive(true);
 
-            // Changed to GetKeyDown so it triggers once per press
             if (Input.GetKeyDown(KeyCode.E))
             {
-                gameObject.SetActive(false); // Hide the crown in the world
-                CrownOnPlayer.SetActive(true); // Show the crown on the player
-                pickUpText.SetActive(false); // Hide the prompt
+                gameObject.SetActive(false);
+                CrownOnPlayer.SetActive(true);
+                pickUpText.SetActive(false);
+
+                // Load next scene after a delay (optional)
+                Invoke("LoadNextScene", 1f); // Waits 1 second before loading
             }
         }
     }
@@ -32,5 +36,10 @@ public class PickUpCrown : MonoBehaviour
         {
             pickUpText.SetActive(false);
         }
+    }
+
+    private void LoadNextScene()
+    {
+        SceneManager.LoadScene(nextSceneName);
     }
 }
