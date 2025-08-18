@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Health Settings")]
-    public int maxHealth = 5;
+    public int maxHealth = 10;
     private int currentHealth;
 
     [Header("References")]
@@ -17,10 +17,12 @@ public class PlayerHealth : MonoBehaviour
         healthbar.SetHealth(currentHealth);
     }
 
-    void OnCollisionEnter(Collision collision)
+    
+    void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        
-        if (collision.gameObject.CompareTag("Trap") || collision.gameObject.CompareTag("Beam") || collision.gameObject.CompareTag("Wrecking Ball"))
+        if (hit.gameObject.CompareTag("Trap") ||
+            hit.gameObject.CompareTag("Beam") ||
+            hit.gameObject.CompareTag("Wrecking Ball"))
         {
             TakeDamage(1);
         }
@@ -41,6 +43,7 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
+        
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
