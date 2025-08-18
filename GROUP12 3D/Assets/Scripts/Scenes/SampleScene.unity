@@ -11520,6 +11520,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pickUpText: {fileID: 1692364891}
   CrownOnPlayer: {fileID: 1379872744}
+  nextSceneName: Level2
 --- !u!65 &508236507
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -26937,15 +26938,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d5e52c19d857bdd47bb9b0433bb5efd5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.07
+      value: -0.37
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d5e52c19d857bdd47bb9b0433bb5efd5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.11
+      value: 21.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d5e52c19d857bdd47bb9b0433bb5efd5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 11.07
+      value: 15.31
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d5e52c19d857bdd47bb9b0433bb5efd5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -34505,13 +34506,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4b3ab606805d834f90461a5d3fe8911, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  gravity: -9.81
-  jumpHeight: 1.5
-  jumpDistance: 2.89
-  cameraTransform: {fileID: 1552845016}
-  lookSensitivity: 1.05
-  verticalLookLimit: 60
+  walkSpeed: 5
+  runSpeed: 10
+  gravity: 9.81
+  jumpPower: 4
+  playerCamera: {fileID: 330585545}
+  lookSpeed: 2
+  lookXLimit: 90
+  crouchHeight: 1
+  crouchSpeed: 3
 --- !u!114 &1552845018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34735,7 +34738,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
