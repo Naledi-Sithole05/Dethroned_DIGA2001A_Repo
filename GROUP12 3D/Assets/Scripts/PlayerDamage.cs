@@ -17,16 +17,16 @@ public class PlayerHealth : MonoBehaviour
         healthbar.SetHealth(currentHealth);
     }
 
-    
-    void OnControllerColliderHit(ControllerColliderHit hit)
+    void OnTriggerEnter(Collider other)
     {
-        if (hit.gameObject.CompareTag("Trap") ||
-            hit.gameObject.CompareTag("Beam") ||
-            hit.gameObject.CompareTag("Wrecking Ball"))
+        if (other.CompareTag("Trap") ||
+            other.CompareTag("Beam") ||
+            other.CompareTag("Wrecking Ball"))
         {
             TakeDamage(1);
         }
     }
+
 
     void TakeDamage(int damage)
     {
@@ -41,9 +41,19 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+ 
+    public void Heal(int amount)
+    {
+        if (currentHealth < maxHealth)
+        {
+            currentHealth += amount;
+            currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+            healthbar.SetHealth(currentHealth);
+        }
+    }
+
     void Die()
     {
-        
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
