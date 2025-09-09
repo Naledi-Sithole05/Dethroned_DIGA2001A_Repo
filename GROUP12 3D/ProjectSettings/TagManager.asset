@@ -9,6 +9,7 @@ TagManager:
   - Trap
   - Wrecking Ball
   - OnPickUp
+  - SpeedBoost
   layers:
   - Default
   - TransparentFX
