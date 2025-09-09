@@ -5828,7 +5828,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e823cd5b5d27c0f4b8256e7c12ee3e6d, type: 2}
+  - {fileID: 2100000, guid: 37af2cc7e327cf046b240b07f36f564a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -35339,7 +35339,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 682ae0103cf67204aac6ea05168c8223, type: 2}
+  - {fileID: 2100000, guid: f8b408550a8038c448dc0c5cd79c54c0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -54721,15 +54721,15 @@ MonoBehaviour:
   runSpeed: 10
   jumpHeight: 2.24
   gravity: -9.81
-  boostSpeed: 10
+  boostSpeed: 15
   boostDuration: 5
   boostSlider: {fileID: 1427649307}
   cameraTransform: {fileID: 330585546}
   lookSensitivity: 1.06
   verticalLookLimit: 52
-  crouchHeight: 2.02
+  crouchHeight: 0.8
   standHeight: 2
-  crouchSpeed: 3
+  crouchSpeed: 3.61
 --- !u!114 &1552845018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64839,7 +64839,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: b4f235b83d749ad428ce7848c60c1ed6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 682ae0103cf67204aac6ea05168c8223, type: 2}
+      objectReference: {fileID: 2100000, guid: 812f7d89cd8b5ee4588dc0c5d365fc00, type: 2}
     - target: {fileID: 919132149155446097, guid: b4f235b83d749ad428ce7848c60c1ed6, type: 3}
       propertyPath: m_Name
       value: chest 005(2)
