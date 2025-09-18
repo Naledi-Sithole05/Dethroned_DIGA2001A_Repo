@@ -5788,7 +5788,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &247273558
 Transform:
   m_ObjectHideFlags: 0
@@ -54725,8 +54725,8 @@ MonoBehaviour:
   boostDuration: 5
   boostSlider: {fileID: 1427649307}
   cameraTransform: {fileID: 330585546}
-  lookSensitivity: 1.06
-  verticalLookLimit: 52
+  lookSensitivity: 0.55
+  verticalLookLimit: 51.6
   crouchHeight: 0.8
   standHeight: 2
   crouchSpeed: 3.61
