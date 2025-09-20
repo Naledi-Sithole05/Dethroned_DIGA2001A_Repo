@@ -1,41 +1,58 @@
- using UnityEngine;
-using UnityEngine.SceneManagement; // Add this line
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PickUpCrown : MonoBehaviour
 {
     public GameObject pickUpText;
     public GameObject CrownOnPlayer;
-    public string nextSceneName = "Level2"; // Set default or assign in Inspector
+    public string nextSceneName = "Level2";
+    public AudioSource crownAudio; // Assign clip here
 
-    void Start()
+    private void Start()
     {
-        pickUpText.SetActive(false);
+        if (pickUpText != null)
+            pickUpText.SetActive(false);
+
+        if (crownAudio != null)
+            crownAudio.playOnAwake = false;
     }
 
     private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            pickUpText.SetActive(true);
+            if (pickUpText != null)
+                pickUpText.SetActive(true);
 
             if (Input.GetKeyDown(KeyCode.E))
             {
-                gameObject.SetActive(false);
-                CrownOnPlayer.SetActive(true);
-                pickUpText.SetActive(false);
+                // Play audio safely even after deactivating crown
+                if (crownAudio != null && crownAudio.clip != null)
+                {
+                    AudioSource.PlayClipAtPoint(crownAudio.clip, transform.position);
+                }
 
-                // Load next scene after a delay (optional)
-                Invoke("LoadNextScene", 1f); // Waits 1 second before loading
+                gameObject.SetActive(false);
+
+                if (CrownOnPlayer != null)
+                    CrownOnPlayer.SetActive(true);
+
+                if (pickUpText != null)
+                    pickUpText.SetActive(false);
+
+                // Load next scene after clip length
+                float delay = crownAudio != null && crownAudio.clip != null
+                                ? crownAudio.clip.length
+                                : 1f;
+                Invoke(nameof(LoadNextScene), delay);
             }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
+        if (other.CompareTag("Player") && pickUpText != null)
             pickUpText.SetActive(false);
-        }
     }
 
     private void LoadNextScene()

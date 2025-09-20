@@ -10,6 +10,7 @@ TagManager:
   - Wrecking Ball
   - OnPickUp
   - SpeedBoost
+  - InvisibilityPowerUp
   layers:
   - Default
   - TransparentFX

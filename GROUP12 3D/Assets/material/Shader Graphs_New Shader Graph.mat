@@ -41,7 +41,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:
-    - _Chest_Crown_color: {r: 1, g: 0.7937419, b: 0.4811319, a: 0}
+    - _Chest_Crown_color: {r: 1, g: 0, b: 0.62196827, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &999812285080802597
