@@ -17605,7 +17605,7 @@ Transform:
   m_GameObject: {fileID: 333661461}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.86, y: 2.09, z: -7.66}
+  m_LocalPosition: {x: -1.2, y: 1.2, z: 1.43}
   m_LocalScale: {x: 0.7, y: 1, z: 0.8277}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17635,7 +17635,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e823cd5b5d27c0f4b8256e7c12ee3e6d, type: 2}
+  - {fileID: 2100000, guid: 5c7d092711068574e9f4a68e11d0afe8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -17942,7 +17942,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.6
+      scalar: 1
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -18964,7 +18964,7 @@ ParticleSystem:
       maxGradient:
         serializedVersion: 2
         key0: {r: 0.9169811, g: 0.046714056, b: 0.046714056, a: 1}
-        key1: {r: 0.90943396, g: 0.8336822, b: 0.073784195, a: 0.22745098}
+        key1: {r: 0.90943396, g: 0.8336822, b: 0.073784195, a: 0.7921569}
         key2: {r: 0, g: 0, b: 0, a: 0}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
@@ -23861,15 +23861,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a67c2e8b961606b439407b56d2475aac, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.32298
+      value: -0.52
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a67c2e8b961606b439407b56d2475aac, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.08
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a67c2e8b961606b439407b56d2475aac, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 25.321
+      value: 28.17
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a67c2e8b961606b439407b56d2475aac, type: 3}
       propertyPath: m_LocalRotation.w
