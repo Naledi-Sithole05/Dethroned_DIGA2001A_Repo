@@ -36117,6 +36117,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: dea401f1b1a24d940a9a910e94f30346, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: eb8b17d07b0f9ce44ae5339224a6ba48, type: 2}
     - target: {fileID: 919132149155446097, guid: dea401f1b1a24d940a9a910e94f30346, type: 3}
       propertyPath: m_Name
       value: castle fence
@@ -58591,6 +58595,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 4f09304b72f0237469ef262675887bad, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: eb8b17d07b0f9ce44ae5339224a6ba48, type: 2}
     - target: {fileID: 919132149155446097, guid: 4f09304b72f0237469ef262675887bad, type: 3}
       propertyPath: m_Name
       value: castle walls
@@ -72550,6 +72558,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 0a5cef2d7c5d0a447a3c99a3f8ed444e, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: eb8b17d07b0f9ce44ae5339224a6ba48, type: 2}
     - target: {fileID: 919132149155446097, guid: 0a5cef2d7c5d0a447a3c99a3f8ed444e, type: 3}
       propertyPath: m_Name
       value: castle bridge
