@@ -46384,27 +46384,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: cea99874f2df74441940e92abe6bf3a1, type: 3}
       propertyPath: m_LocalScale.x
-      value: 404.0734
+      value: 553.4593
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cea99874f2df74441940e92abe6bf3a1, type: 3}
       propertyPath: m_LocalScale.y
-      value: 714.047
+      value: 841.50446
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cea99874f2df74441940e92abe6bf3a1, type: 3}
       propertyPath: m_LocalScale.z
-      value: 719.1092
+      value: 721.62604
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cea99874f2df74441940e92abe6bf3a1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.9715
+      value: 10.1237
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cea99874f2df74441940e92abe6bf3a1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.4699
+      value: -2.4444
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cea99874f2df74441940e92abe6bf3a1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 46.1825
+      value: 46.997
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cea99874f2df74441940e92abe6bf3a1, type: 3}
       propertyPath: m_LocalRotation.w
@@ -57535,6 +57535,7 @@ PrefabInstance:
     - {fileID: 65702495048144492, guid: e4d72e77f06d9204dadfd8c1c2d875ef, type: 3}
     - {fileID: -7029948723529949830, guid: e4d72e77f06d9204dadfd8c1c2d875ef, type: 3}
     - {fileID: -1346369550762627069, guid: e4d72e77f06d9204dadfd8c1c2d875ef, type: 3}
+    - {fileID: -702059844934621083, guid: e4d72e77f06d9204dadfd8c1c2d875ef, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e4d72e77f06d9204dadfd8c1c2d875ef, type: 3}
@@ -61711,7 +61712,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 0ad0eae4445c5dc4bb70cc312f15ceb5, type: 2}
     - target: {fileID: -4699073531199927196, guid: b0373fb3a083b0043b5ae9aa2a378573, type: 3}
       propertyPath: m_LocalScale.x
-      value: 675.286
+      value: 561.83795
       objectReference: {fileID: 0}
     - target: {fileID: -4699073531199927196, guid: b0373fb3a083b0043b5ae9aa2a378573, type: 3}
       propertyPath: m_LocalScale.y
@@ -61723,7 +61724,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -4699073531199927196, guid: b0373fb3a083b0043b5ae9aa2a378573, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.735
+      value: -2.62
       objectReference: {fileID: 0}
     - target: {fileID: -4699073531199927196, guid: b0373fb3a083b0043b5ae9aa2a378573, type: 3}
       propertyPath: m_LocalPosition.y
@@ -61791,7 +61792,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4088688947297397964, guid: b0373fb3a083b0043b5ae9aa2a378573, type: 3}
       propertyPath: m_LocalScale.x
-      value: 589.8661
+      value: 509.0544
       objectReference: {fileID: 0}
     - target: {fileID: 4088688947297397964, guid: b0373fb3a083b0043b5ae9aa2a378573, type: 3}
       propertyPath: m_LocalScale.y
@@ -61803,7 +61804,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4088688947297397964, guid: b0373fb3a083b0043b5ae9aa2a378573, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 13.509
+      value: 16.95
       objectReference: {fileID: 0}
     - target: {fileID: 4088688947297397964, guid: b0373fb3a083b0043b5ae9aa2a378573, type: 3}
       propertyPath: m_LocalPosition.y
@@ -104811,11 +104812,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4b3ab606805d834f90461a5d3fe8911, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 6.45
-  runSpeed: 10
+  moveSpeed: 15
+  runSpeed: 17
   jumpHeight: 1.82
   gravity: -9.81
-  boostSpeed: 15
+  boostSpeed: 20
   boostDuration: 5
   boostSlider: {fileID: 1427649307}
   cameraTransform: {fileID: 330585546}
