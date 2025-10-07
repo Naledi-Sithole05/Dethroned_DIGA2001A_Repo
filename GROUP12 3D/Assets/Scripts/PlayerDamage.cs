@@ -19,20 +19,20 @@ public class PlayerHealth : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        // Damage player when touching any of these tagged objects
         if (other.CompareTag("Trap") ||
             other.CompareTag("Beam") ||
-            other.CompareTag("Wrecking Ball"))
+            other.CompareTag("Wrecking Ball") ||
+            other.CompareTag("Wall"))   // 
         {
             TakeDamage(1);
         }
     }
 
-
     void TakeDamage(int damage)
     {
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
         healthbar.SetHealth(currentHealth);
 
         if (currentHealth <= 0)
@@ -41,7 +41,6 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
- 
     public void Heal(int amount)
     {
         if (currentHealth < maxHealth)
@@ -57,3 +56,4 @@ public class PlayerHealth : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
+
