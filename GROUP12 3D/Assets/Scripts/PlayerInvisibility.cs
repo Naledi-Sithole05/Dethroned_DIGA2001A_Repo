@@ -46,7 +46,7 @@ public class PlayerInvisibility : MonoBehaviour
         // Show Text
         if (invisibilityText != null)
         {
-            invisibilityText.text = "Invisibility On!";
+            invisibilityText.text = "Invisibility On!,You're Hidden from the Guard";
             invisibilityText.gameObject.SetActive(true);
         }
 
