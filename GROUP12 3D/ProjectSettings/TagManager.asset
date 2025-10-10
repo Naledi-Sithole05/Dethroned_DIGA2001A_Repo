@@ -12,6 +12,7 @@ TagManager:
   - SpeedBoost
   - InvisibilityPowerUp
   - Wall
+  - Door
   layers:
   - Default
   - TransparentFX
