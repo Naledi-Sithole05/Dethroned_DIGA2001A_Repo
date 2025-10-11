@@ -12,9 +12,12 @@ public class PlayerInvisibility : MonoBehaviour
     [Range(0f, 1f)]
     public float invisibleAlpha = 0.2f;
 
-    [Header("UI")]
-    [Tooltip("Reference")]
+    [Header("UI Settings")]
+    [Tooltip("Reference to the text that shows invisibility status.")]
     public TextMeshProUGUI invisibilityText;
+
+    [Tooltip("How long the text stays visible after activating invisibility.")]
+    public float textVisibleDuration = 2f; 
 
     private Renderer[] renderers;
     private bool isInvisible = false;
@@ -40,26 +43,27 @@ public class PlayerInvisibility : MonoBehaviour
     private IEnumerator BecomeInvisible()
     {
         isInvisible = true;
-
         SetAlpha(invisibleAlpha);
 
         // Show Text
         if (invisibilityText != null)
         {
-            invisibilityText.text = "Invisibility On!,You're Hidden from the Guard";
+            invisibilityText.text = "Invisibility On! You're hidden from the guard.";
             invisibilityText.gameObject.SetActive(true);
         }
 
-        yield return new WaitForSeconds(invisibilityDuration);
+        // Text visible only for specified duration
+        yield return new WaitForSeconds(textVisibleDuration);
 
+        if (invisibilityText != null)
+            invisibilityText.gameObject.SetActive(false);
+
+        // Wait for remaining invisibility duration (minus text time)
+        yield return new WaitForSeconds(invisibilityDuration - textVisibleDuration);
+
+        // Turn visible again
         SetAlpha(1f);
         isInvisible = false;
-
-        // Hide Text
-        if (invisibilityText != null)
-        {
-            invisibilityText.gameObject.SetActive(false);
-        }
     }
 
     private void SetAlpha(float alpha)
@@ -71,7 +75,6 @@ public class PlayerInvisibility : MonoBehaviour
                 Color c = rend.material.color;
                 c.a = alpha;
                 rend.material.color = c;
-
                 SetMaterialTransparent(rend.material, alpha < 1f);
             }
         }
