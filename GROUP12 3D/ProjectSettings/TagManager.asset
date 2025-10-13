@@ -13,6 +13,8 @@ TagManager:
   - InvisibilityPowerUp
   - Wall
   - Door
+  - Guard
+  - JumpBoost
   layers:
   - Default
   - TransparentFX

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;   // Needed for Slider
+using UnityEngine.UI;   
+using System.Collections; 
 
 [RequireComponent(typeof(CharacterController))]
 public class FPController : MonoBehaviour
@@ -12,10 +13,19 @@ public class FPController : MonoBehaviour
     public float gravity = -9.81f;
 
     [Header("Speed Boost Settings")]
-    public float boostSpeed = 12f;           // Speed during boost
-    public float boostDuration = 5f;         // Total boost time (depletes only when moving)
-    private float remainingBoostTime = 0f;   // Tracks how much boost is left
+    public float boostSpeed = 12f;          
+    public float boostDuration = 5f;         
+    private float remainingBoostTime = 0f;   
     private bool isBoosted = false;
+
+    [Header("Jump Boost Settings")]
+    [Tooltip("How much the jump height is multiplied during a jump boost.")]
+    public float jumpBoostMultiplier = 2f;
+
+    [Tooltip("How long the jump boost effect lasts (in seconds).")]
+    public float jumpBoostDuration = 5f;
+
+    private Coroutine jumpBoostRoutine; // Handles jump boost timer
 
     [Header("UI Settings")]
     public Slider boostSlider;               // Reference to UI slider
@@ -37,6 +47,7 @@ public class FPController : MonoBehaviour
     private float verticalRotation = 0f;
 
     private float defaultMoveSpeed;
+    private float defaultJumpHeight;
     private bool isRunning;
     private bool isCrouching;
 
@@ -44,6 +55,7 @@ public class FPController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         defaultMoveSpeed = moveSpeed;
+        defaultJumpHeight = jumpHeight;
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -160,21 +172,52 @@ public class FPController : MonoBehaviour
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
+        // Handle Speed Boost
         if (hit.collider.CompareTag("SpeedBoost"))
         {
             isBoosted = true;
             remainingBoostTime = boostDuration;
-
             moveSpeed = boostSpeed;
 
             if (boostSlider != null)
             {
                 boostSlider.maxValue = boostDuration;
                 boostSlider.value = boostDuration;
-                boostSlider.gameObject.SetActive(true); // Show UI
+                boostSlider.gameObject.SetActive(true);
             }
 
-            Destroy(hit.gameObject); // Remove boost object
+            Destroy(hit.gameObject);
         }
+
+        // Handle Jump Boost
+        if (hit.collider.CompareTag("JumpBoost"))
+        {
+            ApplyJumpBoost(jumpBoostMultiplier, jumpBoostDuration);
+
+            // Disable the jump boost object and respawn it later
+            JumpBoostPickup pickup = hit.collider.GetComponent<JumpBoostPickup>();
+            if (pickup != null)
+                pickup.StartRespawn();
+
+        }
+    }
+
+    
+    public void ApplyJumpBoost(float multiplier, float duration)
+    {
+        if (jumpBoostRoutine != null)
+            StopCoroutine(jumpBoostRoutine);
+
+        jumpBoostRoutine = StartCoroutine(JumpBoostRoutine(multiplier, duration));
+    }
+
+    private IEnumerator JumpBoostRoutine(float multiplier, float duration)
+    {
+        jumpHeight = defaultJumpHeight * multiplier;
+
+        yield return new WaitForSeconds(duration);
+
+        jumpHeight = defaultJumpHeight;
+        jumpBoostRoutine = null;
     }
 }
