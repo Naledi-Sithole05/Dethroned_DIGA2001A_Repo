@@ -1,37 +1,26 @@
 using UnityEngine;
-using Unity.Collections;
 using TMPro;
-using UnityEditor.Rendering;
-using System.Timers;
 
 public class Timer : MonoBehaviour
 {
-    
-    
-    
-        [SerializeField] TextMeshProUGUI timerText;
-        [SerializeField] float remainingTime;
-    
+    [SerializeField] private TextMeshProUGUI timerText;
+    [SerializeField] private float remainingTime = 60f; // set default value if you want
 
-    // Update is called once per frame
     void Update()
-
     {
         if (remainingTime > 0)
         {
-            remainingTime -= Time.deltaTime;    
-        }
-        else if  (remainingTime < 0)
-        { 
-            remainingTime = 0;  
-            timerText.color = Color.red;  
-        }
-
-
             remainingTime -= Time.deltaTime;
+
+            if (remainingTime <= 0)
+            {
+                remainingTime = 0;
+                timerText.color = Color.red;
+            }
+        }
+
         int minutes = Mathf.FloorToInt(remainingTime / 60);
         int seconds = Mathf.FloorToInt(remainingTime % 60);
-        timerText.text = string.Format ("{0:00}: {1:00}", minutes, seconds);
-        
+        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 }
