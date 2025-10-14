@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public class PowerUp : MonoBehaviour
 {
@@ -12,6 +13,13 @@ public class PowerUp : MonoBehaviour
 
     [Tooltip("Time before this power-up respawns (in seconds).")]
     public float respawnTime = 300f; // 5 minutes by default
+
+    [Header("UI Settings")]
+    [Tooltip("Text prefab to show when collected (e.g., '+2 Life')")]
+    public GameObject floatingTextPrefab;
+
+    [Tooltip("Where to spawn the text above the pickup.")]
+    public Vector3 textOffset = new Vector3(0, 2f, 0);
 
     private Collider col;
     private Renderer rend;
@@ -32,7 +40,21 @@ public class PowerUp : MonoBehaviour
                 playerHealth.Heal(healAmount);
             }
 
+            ShowFloatingText();
             StartCoroutine(HandlePickup());
+        }
+    }
+
+    private void ShowFloatingText()
+    {
+        if (floatingTextPrefab != null)
+        {
+            GameObject textObj = Instantiate(floatingTextPrefab, transform.position + textOffset, Quaternion.identity);
+
+            // Optional: update text dynamically
+            TextMeshPro tmp = textObj.GetComponentInChildren<TextMeshPro>();
+            if (tmp != null)
+                tmp.text = "+{healAmount} Life";
         }
     }
 
