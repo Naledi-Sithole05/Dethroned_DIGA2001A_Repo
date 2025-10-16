@@ -21089,6 +21089,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 118485562}
+  - component: {fileID: 118485563}
   m_Layer: 0
   m_Name: Mission Accomplised
   m_TagString: Untagged
@@ -21111,6 +21112,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &118485563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 118485561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bec0f0b3548935a44b6d7ba26296abeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  crownScript: {fileID: 508236506}
 --- !u!1 &122166797 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8869669039281602302, guid: e4d72e77f06d9204dadfd8c1c2d875ef, type: 3}
@@ -42477,6 +42491,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0.18
       objectReference: {fileID: 0}
+    - target: {fileID: -5076484507258936684, guid: 03d7707d4d80df84f96776e2e7931180, type: 3}
+      propertyPath: m_Lightmapping
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -2601552257854514524, guid: 03d7707d4d80df84f96776e2e7931180, type: 3}
+      propertyPath: m_Lightmapping
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 03d7707d4d80df84f96776e2e7931180, type: 3}
       propertyPath: m_Name
       value: Dining Set 2
@@ -42484,6 +42506,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 8009987137999418058, guid: 03d7707d4d80df84f96776e2e7931180, type: 3}
+    - {fileID: 8603541622604761643, guid: 03d7707d4d80df84f96776e2e7931180, type: 3}
+    - {fileID: 5392398322951045289, guid: 03d7707d4d80df84f96776e2e7931180, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03d7707d4d80df84f96776e2e7931180, type: 3}
@@ -43453,6 +43477,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -0.48659
       objectReference: {fileID: 0}
+    - target: {fileID: -5076484507258936684, guid: 14b46d59bae4e784bb2064698f737a99, type: 3}
+      propertyPath: m_Lightmapping
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: -4292154010595695564, guid: 14b46d59bae4e784bb2064698f737a99, type: 3}
       propertyPath: m_LocalScale.x
       value: 84.76401
@@ -43634,7 +43662,8 @@ PrefabInstance:
       value: 3.8718734
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5392398322951045289, guid: 14b46d59bae4e784bb2064698f737a99, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 14b46d59bae4e784bb2064698f737a99, type: 3}
@@ -56557,6 +56586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pickUpText: {fileID: 1692364891}
+  exitText: {fileID: 1922785135}
   CrownOnPlayer: {fileID: 1379872744}
   nextSceneName: Level2
   crownAudio: {fileID: 823042449}
@@ -56579,8 +56609,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.237387, y: 2.095824, z: 2.767925}
-  m_Center: {x: 0.052247323, y: -0.1329852, z: 0.6171282}
+  m_Size: {x: 2.237387, y: 3.1118355, z: 2.7679248}
+  m_Center: {x: 0.05224735, y: -0.10315834, z: 0.6171283}
 --- !u!1001 &511662973
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -72414,6 +72444,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 1.88
       objectReference: {fileID: 0}
+    - target: {fileID: -2601552257854514524, guid: d676cb72f5b798f4ba2adabb335f2da8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: -2093772787462966335, guid: d676cb72f5b798f4ba2adabb335f2da8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.89
@@ -72477,6 +72511,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: -7146521406498821007, guid: d676cb72f5b798f4ba2adabb335f2da8, type: 3}
+    - {fileID: 8603541622604761643, guid: d676cb72f5b798f4ba2adabb335f2da8, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d676cb72f5b798f4ba2adabb335f2da8, type: 3}
@@ -114425,7 +114460,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -114441,7 +114476,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1922785136}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -115699,7 +115735,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Guard will arrive in '
+  m_text: Guard Patrol begins in
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -128293,15 +128329,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d5e52c19d857bdd47bb9b0433bb5efd5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 81.3077
+      value: 84.19
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d5e52c19d857bdd47bb9b0433bb5efd5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 263.0494
+      value: 260.29
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d5e52c19d857bdd47bb9b0433bb5efd5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 149.9918
+      value: 154.94
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d5e52c19d857bdd47bb9b0433bb5efd5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -167584,7 +167620,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timerText: {fileID: 808375050}
-  remainingTime: 600
+  remainingTime: 300
 --- !u!1 &1606899718 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2459110298006171230, guid: e4d72e77f06d9204dadfd8c1c2d875ef, type: 3}
@@ -172812,7 +172848,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timerText: {fileID: 808375050}
-  remainingTime: 600
+  remainingTime: 300
   guardAI: {fileID: 845984359}
 --- !u!4 &1647153591
 Transform:
@@ -194281,6 +194317,142 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 1969476169269212006, guid: e4d72e77f06d9204dadfd8c1c2d875ef, type: 3}
+--- !u!1 &1922785135
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1922785136}
+  - component: {fileID: 1922785138}
+  - component: {fileID: 1922785137}
+  m_Layer: 5
+  m_Name: Crown Pick up
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1922785136
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1922785135}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 937461176}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -31, y: 155}
+  m_SizeDelta: {x: 200, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1922785137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1922785135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: Leave the castel but dont get Detected by the guard
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 15.67
+  m_fontSizeBase: 15.67
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1922785138
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1922785135}
+  m_CullTransparentMesh: 1
 --- !u!1 &1923673857 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e58a38469b8c0824d90f7d84b2c21895, type: 3}

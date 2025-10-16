@@ -3,15 +3,20 @@ using UnityEngine.SceneManagement;
 
 public class PickUpCrown : MonoBehaviour
 {
-    public GameObject pickUpText;
+    public GameObject pickUpText;       // Text displayed when near crown
+    public GameObject exitText;         // Text telling player to exit castle
     public GameObject CrownOnPlayer;
     public string nextSceneName = "Level2";
-    public AudioSource crownAudio; // Assign clip here
+    public AudioSource crownAudio;      // Assign clip here
+    private bool hasCrown = false;      // Track if player picked up crown
 
     private void Start()
     {
         if (pickUpText != null)
             pickUpText.SetActive(false);
+
+        if (exitText != null)
+            exitText.SetActive(false);
 
         if (crownAudio != null)
             crownAudio.playOnAwake = false;
@@ -19,14 +24,14 @@ public class PickUpCrown : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !hasCrown)
         {
             if (pickUpText != null)
                 pickUpText.SetActive(true);
 
             if (Input.GetKeyDown(KeyCode.E))
             {
-                // Play audio safely even after deactivating crown
+                // Play audio safely
                 if (crownAudio != null && crownAudio.clip != null)
                 {
                     AudioSource.PlayClipAtPoint(crownAudio.clip, transform.position);
@@ -40,23 +45,27 @@ public class PickUpCrown : MonoBehaviour
                 if (pickUpText != null)
                     pickUpText.SetActive(false);
 
-                // Load next scene after clip length
-                float delay = crownAudio != null && crownAudio.clip != null
-                                ? crownAudio.clip.length
-                                : 1f;
-                Invoke(nameof(LoadNextScene), delay);
+                // Show exit text
+                if (exitText != null)
+                    exitText.SetActive(true);
+
+                hasCrown = true; // Player now has the crown
             }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player") && pickUpText != null)
+        if (other.CompareTag("Player") && !hasCrown && pickUpText != null)
             pickUpText.SetActive(false);
     }
 
-    private void LoadNextScene()
+    // Call this method from your "Mission Accomplished" trigger
+    public void CompleteMission()
     {
-        SceneManager.LoadScene(nextSceneName);
+        if (hasCrown)
+        {
+            SceneManager.LoadScene(nextSceneName);
+        }
     }
 }
