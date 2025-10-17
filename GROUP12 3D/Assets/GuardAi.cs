@@ -6,7 +6,6 @@ public class GuardAI : MonoBehaviour
 {
     [Header("Patrol Settings")]
     [SerializeField] private Transform[] waypoints;
-    [SerializeField] private float patrolSpeed = 20f;
 
     [Header("Detection Settings")]
     [SerializeField] private Transform player;
@@ -16,6 +15,7 @@ public class GuardAI : MonoBehaviour
     private NavMeshAgent agent;
     private int currentWaypoint = 0;
     private bool isActive = false;
+    private Renderer[] renderers;
 
     void Awake()
     {
@@ -24,6 +24,12 @@ public class GuardAI : MonoBehaviour
         {
             Debug.LogError("GuardAI: Missing NavMeshAgent.");
         }
+
+        // Get all renderers (in case the guard has multiple meshes)
+        renderers = GetComponentsInChildren<Renderer>();
+
+        // Make guard invisible at start
+        SetGuardVisible(false);
         agent.isStopped = true; // stop movement until activated
     }
 
@@ -41,6 +47,9 @@ public class GuardAI : MonoBehaviour
 
         isActive = true;
         agent.isStopped = false;
+
+        // Make guard visible
+        SetGuardVisible(true);
 
         if (waypoints.Length > 0)
         {
@@ -75,6 +84,16 @@ public class GuardAI : MonoBehaviour
                 SceneManager.LoadScene(gameOverSceneName);
             else
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+    }
+
+    private void SetGuardVisible(bool visible)
+    {
+        if (renderers == null) return;
+
+        foreach (Renderer rend in renderers)
+        {
+            rend.enabled = visible;
         }
     }
 }

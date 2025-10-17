@@ -88,11 +88,11 @@ public class PlayerHealthManager : MonoBehaviour
         playerObject.transform.position = startPosition;
 
         // Stop all motion
-#if UNITY_6000_0_OR_NEWER
+ 
         playerRigidbody.linearVelocity = Vector3.zero;
-#else
-        playerRigidbody.velocity = Vector3.zero;
-#endif
+
+        
+
         playerRigidbody.angularVelocity = Vector3.zero;
 
         // Restore health
