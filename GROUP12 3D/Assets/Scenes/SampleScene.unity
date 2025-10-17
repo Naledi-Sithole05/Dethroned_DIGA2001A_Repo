@@ -10181,7 +10181,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &43590211
 RectTransform:
   m_ObjectHideFlags: 0
@@ -72436,6 +72436,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -5076484507258936684, guid: d676cb72f5b798f4ba2adabb335f2da8, type: 3}
+      propertyPath: m_Lightmapping
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: -3542852092398272455, guid: d676cb72f5b798f4ba2adabb335f2da8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.94
@@ -72512,6 +72516,7 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: -7146521406498821007, guid: d676cb72f5b798f4ba2adabb335f2da8, type: 3}
     - {fileID: 8603541622604761643, guid: d676cb72f5b798f4ba2adabb335f2da8, type: 3}
+    - {fileID: 5392398322951045289, guid: d676cb72f5b798f4ba2adabb335f2da8, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d676cb72f5b798f4ba2adabb335f2da8, type: 3}
