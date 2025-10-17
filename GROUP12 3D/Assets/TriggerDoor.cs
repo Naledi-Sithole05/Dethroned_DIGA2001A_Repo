@@ -1,64 +1,82 @@
 using UnityEngine;
-using TMPro; // Use this for TextMeshProUGUI
+using TMPro;
 
 public class DoorInteraction : MonoBehaviour
 {
     [Header("References")]
     public Animator doorAnimator;
-    public TextMeshProUGUI interactionText; // TMP text reference
+    public TextMeshProUGUI interactionText;
     public string openTrigger = "Open";
     public string closeTrigger = "Close";
 
     [Header("Settings")]
-    public bool isOpen = false; // Tracks whether the door is open
-    private bool playerIsNear = false;
+    public bool isOpen = false;
+    public float closeDelay = 1f; // Time after leaving before door closes
 
-    void Start()
+    private bool playerInside = false;
+    private Coroutine closeCoroutine;
+
+    private void Start()
     {
         if (interactionText != null)
             interactionText.gameObject.SetActive(false);
     }
 
-    void Update()
-    {
-        if (playerIsNear)
-        {
-            if (interactionText != null)
-                interactionText.text = isOpen ? "Press 'O' to Close" : "Press 'O' to Open";
-
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                if (isOpen)
-                {
-                    doorAnimator.SetTrigger(closeTrigger);
-                    isOpen = false;
-                }
-                else
-                {
-                    doorAnimator.SetTrigger(openTrigger);
-                    isOpen = true;
-                }
-            }
-        }
-    }
-
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (!other.CompareTag("Player")) return;
+
+        playerInside = true;
+
+        if (!isOpen)
         {
-            playerIsNear = true;
+            // Open the door immediately
+            doorAnimator.SetTrigger(openTrigger);
+            isOpen = true;
+            Debug.Log("Door opened automatically.");
+
             if (interactionText != null)
+            {
+                interactionText.text = "Door Opening...";
                 interactionText.gameObject.SetActive(true);
+            }
+        }
+
+        // Stop any close coroutine (if player re-enters quickly)
+        if (closeCoroutine != null)
+        {
+            StopCoroutine(closeCoroutine);
+            closeCoroutine = null;
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (!other.CompareTag("Player")) return;
+
+        playerInside = false;
+
+        // Delay the close a bit — ensures player fully left area
+        if (closeCoroutine != null)
+            StopCoroutine(closeCoroutine);
+        closeCoroutine = StartCoroutine(CloseDoorAfterDelay());
+    }
+
+    private System.Collections.IEnumerator CloseDoorAfterDelay()
+    {
+        yield return new WaitForSeconds(closeDelay);
+
+        if (!playerInside && isOpen)
         {
-            playerIsNear = false;
+            doorAnimator.SetTrigger(closeTrigger);
+            isOpen = false;
+            Debug.Log("Door closed automatically after player left.");
+
             if (interactionText != null)
+            {
+                interactionText.text = "Door Closing...";
                 interactionText.gameObject.SetActive(false);
+            }
         }
     }
 }
