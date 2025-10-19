@@ -1,104 +1,116 @@
- using UnityEngine;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
     [Header("UI Panels")]
-    [SerializeField] GameObject pauseMenu;
-    [SerializeField] GameObject settingsPanel;
-    [SerializeField] GameObject helpPanel;
+    public GameObject pausePanel;
+    public GameObject settingsPanel;
+    public GameObject helpPanel;
+    
+    [Header("Pause Button")]
+    public GameObject pauseButton;
+    
+    private bool isPaused = false;
 
-    void Update()
+    void Start()
     {
-        // Add keyboard input to open/close pause menu (commonly Escape key)
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (pauseMenu.activeInHierarchy)
-            {
-                Resume();
-            }
-            else
-            {
-                Pause();
-            }
-        }
-    }
-
-    public void Pause()
-    {
-        if (pauseMenu != null)
-        {
-            pauseMenu.SetActive(true);
-            Time.timeScale = 0f;
-        }
-        else
-        {
-            Debug.LogError("PauseMenu reference is missing!");
-        }
-    }
-
-    public void Home()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("Main Menu");
-    }
-
-    public void Resume()
-    {
-        // Close all panels first
-        if (pauseMenu != null) pauseMenu.SetActive(false);
+        // Ensure all panels are closed at start
+        if (pausePanel != null) pausePanel.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(false);
         if (helpPanel != null) helpPanel.SetActive(false);
         
-        Time.timeScale = 1f;
+        // Ensure pause button is visible
+        if (pauseButton != null) pauseButton.SetActive(true);
     }
 
-    public void Restart()
+    void Update()
     {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        // Optional: Add keyboard support (Escape key to pause/unpause)
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (isPaused)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+            }
+        }
     }
 
+    // Called by the Pause Button in your UI
+    public void PauseGame()
+    {
+        isPaused = true;
+        Time.timeScale = 0f; // Freeze game time
+        
+        // Show pause panel, hide pause button
+        if (pausePanel != null) pausePanel.SetActive(true);
+        if (pauseButton != null) pauseButton.SetActive(false);
+        
+        // Close other panels
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (helpPanel != null) helpPanel.SetActive(false);
+    }
+
+    // Called by the Resume Button
+    public void ResumeGame()
+    {
+        isPaused = false;
+        Time.timeScale = 1f; // Resume game time
+        
+        // Hide all panels, show pause button
+        if (pausePanel != null) pausePanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (helpPanel != null) helpPanel.SetActive(false);
+        if (pauseButton != null) pauseButton.SetActive(true);
+    }
+
+    // Called by the Settings Button
     public void OpenSettings()
     {
         if (settingsPanel != null)
         {
             settingsPanel.SetActive(true);
-            // Optional: hide other panels
+            // Optionally hide other panels
             if (helpPanel != null) helpPanel.SetActive(false);
         }
     }
 
-    public void CloseSettings()
-    {
-        if (settingsPanel != null)
-            settingsPanel.SetActive(false);
-    }
-
+    // Called by the Help Button
     public void OpenHelp()
     {
         if (helpPanel != null)
         {
             helpPanel.SetActive(true);
-            // Optional: hide other panels
+            // Optionally hide other panels
             if (settingsPanel != null) settingsPanel.SetActive(false);
         }
     }
 
-    public void CloseHelp()
-    {
-        if (helpPanel != null)
-            helpPanel.SetActive(false);
-    }
-
+    // Called by the Quit Button
     public void QuitGame()
     {
-        Debug.Log("Quitting game...");
-        Application.Quit();
+        // Resume time scale before quitting to avoid issues
+        Time.timeScale = 1f;
         
-        // For testing in Editor
         #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
         #endif
+    }
+
+    // Optional: Back button functionality for settings/help panels
+    public void CloseSettings()
+    {
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+    }
+
+    public void CloseHelp()
+    {
+        if (helpPanel != null) helpPanel.SetActive(false);
     }
 }
