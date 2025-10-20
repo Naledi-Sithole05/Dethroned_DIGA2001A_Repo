@@ -45,6 +45,10 @@ public class FPController : MonoBehaviour
     public float standHeight = 2f;
     public float crouchSpeed = 2.5f;
 
+
+    [Header("ANIMATION SETTINGS")]
+    [Space(5)]
+    public Animator animator;
    
     private CharacterController controller;
     private Vector2 moveInput;
@@ -156,6 +160,8 @@ public class FPController : MonoBehaviour
 
         cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
         transform.Rotate(Vector3.up * mouseX);
+
+        float movementMagnitude = new Vector2 (moveInput.x, moveInput.y) .magnitude;
     }
     #endregion
 
