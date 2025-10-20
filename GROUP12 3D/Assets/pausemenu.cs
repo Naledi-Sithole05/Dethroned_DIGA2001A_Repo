@@ -1,4 +1,4 @@
-   using UnityEngine;
+ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
@@ -13,7 +13,7 @@ public class PauseMenu : MonoBehaviour
 
     public void Home()
     {
-        SceneManager.LoadScene("Main Menu");
+        SceneManager.LoadScene("mainmenu"); // Fixed scene name
         Time.timeScale = 1;
     }
 
@@ -23,7 +23,7 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1;
     }
 
-    public void Quit()
+    public void Restart() // Renamed from Quit for clarity
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Time.timeScale = 1;
