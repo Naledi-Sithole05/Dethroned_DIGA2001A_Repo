@@ -148,6 +148,10 @@ public class FPController : MonoBehaviour
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        //Animation
+        float movementMagnitude = new Vector2(moveInput .x, moveInput.y) .magnitude ;
+        animator. SetFloat("Speed", movementMagnitude );
     }
 
     private void HandleLook()
