@@ -9,11 +9,7 @@ public class FPController : MonoBehaviour
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
     public float runSpeed = 8f;
-
-  
     public float jumpHeight = 1.5f;
-
-   
     public float gravity = -25f;
     public float jumpSpeedMultiplier = 1.5f;
 
@@ -22,13 +18,10 @@ public class FPController : MonoBehaviour
     public float boostDuration = 5f;
 
     [Header("Jump Boost Settings")]
-    
     public float jumpBoostMultiplier = 2f;
-    
     public float jumpBoostDuration = 5f;
 
     [Header("Invisibility Settings")]
-   
     public bool isInvisible = false;
     private float invisibilityTimer = 0f;
 
@@ -45,11 +38,6 @@ public class FPController : MonoBehaviour
     public float standHeight = 2f;
     public float crouchSpeed = 2.5f;
 
-
-    [Header("ANIMATION SETTINGS")]
-    [Space(5)]
-    public Animator animator;
-   
     private CharacterController controller;
     private Vector2 moveInput;
     private Vector2 lookInput;
@@ -62,7 +50,6 @@ public class FPController : MonoBehaviour
     private bool isCrouching;
     private bool isBoosted = false;
     private float remainingBoostTime = 0f;
-
     private Coroutine jumpBoostRoutine;
 
     private void Awake()
@@ -70,7 +57,6 @@ public class FPController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         defaultMoveSpeed = moveSpeed;
         defaultJumpHeight = jumpHeight;
-
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -87,7 +73,6 @@ public class FPController : MonoBehaviour
         UpdateBoostUI();
     }
 
-    #region Input Methods
     public void OnMove(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
@@ -106,9 +91,7 @@ public class FPController : MonoBehaviour
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.performed && controller.isGrounded)
-        {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity) * jumpSpeedMultiplier;
-        }
     }
 
     public void OnCrouch(InputAction.CallbackContext context)
@@ -126,14 +109,11 @@ public class FPController : MonoBehaviour
             moveSpeed = defaultMoveSpeed;
         }
     }
-    #endregion
 
-    #region Movement & Look
     private void HandleMovement()
     {
         float currentSpeed = moveSpeed;
 
-        // Adjust speeds
         if (isBoosted)
             currentSpeed = boostSpeed;
         else if (isRunning && !isCrouching)
@@ -142,16 +122,11 @@ public class FPController : MonoBehaviour
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         controller.Move(move * currentSpeed * Time.deltaTime);
 
-        // Gravity handling
         if (controller.isGrounded && velocity.y < 0)
             velocity.y = -2f;
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
-
-        //Animation
-        float movementMagnitude = new Vector2(moveInput .x, moveInput.y) .magnitude ;
-        animator. SetFloat("Speed", movementMagnitude );
     }
 
     private void HandleLook()
@@ -164,12 +139,8 @@ public class FPController : MonoBehaviour
 
         cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
         transform.Rotate(Vector3.up * mouseX);
-
-        float movementMagnitude = new Vector2 (moveInput.x, moveInput.y) .magnitude;
     }
-    #endregion
 
-    #region Boost Logic
     private void HandleBoostDecay()
     {
         if (isBoosted && moveInput.magnitude > 0f)
@@ -194,7 +165,6 @@ public class FPController : MonoBehaviour
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        // SPEED BOOST pickup
         if (hit.collider.CompareTag("SpeedBoost"))
         {
             isBoosted = true;
@@ -211,29 +181,13 @@ public class FPController : MonoBehaviour
             Destroy(hit.gameObject);
         }
 
-        // JUMP BOOST pickup
         if (hit.collider.CompareTag("JumpBoost"))
         {
             ApplyJumpBoost(jumpBoostMultiplier, jumpBoostDuration);
-
             JumpBoostPickup pickup = hit.collider.GetComponent<JumpBoostPickup>();
             if (pickup != null)
                 pickup.StartRespawn();
         }
-
-        
-        if (hit.collider.CompareTag("InvisibilityPowerUp"))
-        {
-            InvisibilityPickup pickup = hit.collider.GetComponent<InvisibilityPickup>();
-            if (pickup != null)
-            {
-                // Give the player invisibility
-                ActivateInvisibility(pickup.invisibilityDuration);
-
-               
-            }
-        }
-
     }
 
     public void ApplyJumpBoost(float multiplier, float duration)
@@ -251,14 +205,11 @@ public class FPController : MonoBehaviour
         jumpHeight = defaultJumpHeight;
         jumpBoostRoutine = null;
     }
-    #endregion
 
-    #region Invisibility
     public void ActivateInvisibility(float duration)
     {
         isInvisible = true;
         invisibilityTimer = duration;
-        Debug.Log("Player is now invisible to guards!");
     }
 
     private void HandleInvisibilityTimer()
@@ -267,11 +218,7 @@ public class FPController : MonoBehaviour
         {
             invisibilityTimer -= Time.deltaTime;
             if (invisibilityTimer <= 0f)
-            {
                 isInvisible = false;
-                Debug.Log("Invisibility has worn off.");
-            }
         }
     }
-    #endregion
 }
