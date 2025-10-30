@@ -9,9 +9,11 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("References")]
     public Healthbar healthbar;
+    public DamageFlash bloodFlash;
+
     private Transform wreckingBall;
-    private float wreckingBallDamageRange = 2.5f; // How close the ball needs to be to deal damage
-    private float wreckingBallDamageCooldown = 1f; // Seconds between hits
+    private float wreckingBallDamageRange = 2.5f;
+    private float wreckingBallDamageCooldown = 1f;
     private float nextDamageTime = 0f;
 
     void Start()
@@ -20,7 +22,6 @@ public class PlayerHealth : MonoBehaviour
         healthbar.SetMaxHealth(maxHealth);
         healthbar.SetHealth(currentHealth);
 
-        // Find the wrecking ball in the scene by tag
         GameObject wb = GameObject.FindGameObjectWithTag("Wrecking Ball");
         if (wb != null)
             wreckingBall = wb.transform;
@@ -31,15 +32,12 @@ public class PlayerHealth : MonoBehaviour
     void Update()
     {
         DetectWreckingBall();
-
-        // You can keep other Update logic here
     }
 
     void DetectWreckingBall()
     {
         if (wreckingBall == null) return;
 
-        // Perform a raycast between wrecking ball and player
         Vector3 direction = (wreckingBall.position - transform.position).normalized;
         float distance = Vector3.Distance(transform.position, wreckingBall.position);
 
@@ -48,14 +46,12 @@ public class PlayerHealth : MonoBehaviour
             Ray ray = new Ray(transform.position, direction);
             RaycastHit hit;
 
-            // If nothing blocks the line between them
             if (Physics.Raycast(ray, out hit, wreckingBallDamageRange))
             {
                 if (hit.collider.CompareTag("Wrecking Ball") && Time.time >= nextDamageTime)
                 {
                     TakeDamage(1);
                     nextDamageTime = Time.time + wreckingBallDamageCooldown;
-                    Debug.Log("Player hit by wrecking ball via raycast!");
                 }
             }
         }
@@ -63,7 +59,6 @@ public class PlayerHealth : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        // Handle other traps normally
         if (other.CompareTag("Trap") || other.CompareTag("Beam"))
         {
             TakeDamage(1);
@@ -75,6 +70,9 @@ public class PlayerHealth : MonoBehaviour
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         healthbar.SetHealth(currentHealth);
+
+        if (bloodFlash != null)
+            bloodFlash.Flash();
 
         if (currentHealth <= 0)
         {
@@ -94,6 +92,25 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        //  Respawn using CheckpointManager if available
+#if UNITY_2023_1_OR_NEWER
+        CheckpointManager checkpointManager = Object.FindFirstObjectByType<CheckpointManager>();
+#else
+        CheckpointManager checkpointManager = FindObjectOfType<CheckpointManager>();
+#endif
+
+        if (checkpointManager != null)
+        {
+            checkpointManager.RespawnPlayer();
+
+            // Restore full health
+            currentHealth = maxHealth;
+            healthbar.SetHealth(currentHealth);
+        }
+        else
+        {
+            // Fallback if no checkpoint system exists
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 }
