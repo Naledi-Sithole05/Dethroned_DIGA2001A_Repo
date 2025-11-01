@@ -1,6 +1,6 @@
 using System.Collections;
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
 
 public class CheckpointManager : MonoBehaviour
 {
@@ -9,11 +9,11 @@ public class CheckpointManager : MonoBehaviour
     {
         public Collider startTrigger;
         public Collider endTrigger;
-        public string checkpointText = "Checkpoint Reached!";
+        public Sprite checkpointSprite; // Sprite to show on UI
     }
 
     public Checkpoint[] checkpoints;
-    public TextMeshProUGUI checkpointUIText;
+    public Image checkpointUIImage; // Reference to the UI Image in Canvas
     public float displayDuration = 2f;
     public float fadeDuration = 1f;
 
@@ -26,11 +26,11 @@ public class CheckpointManager : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
 
-        if (checkpointUIText != null)
+        if (checkpointUIImage != null)
         {
-            Color c = checkpointUIText.color;
+            Color c = checkpointUIImage.color;
             c.a = 0f;
-            checkpointUIText.color = c;
+            checkpointUIImage.color = c;
         }
 
         foreach (var cp in checkpoints)
@@ -58,42 +58,42 @@ public class CheckpointManager : MonoBehaviour
             lastCheckpointPosition = cp.startTrigger.transform.position;
             checkpointReached = true;
 
-            if (!isFading && checkpointUIText != null)
-                StartCoroutine(FadeCheckpointText(cp.checkpointText));
+            if (!isFading && checkpointUIImage != null && cp.checkpointSprite != null)
+                StartCoroutine(FadeCheckpointSprite(cp.checkpointSprite));
         }
         else
         {
-            Debug.Log($"{cp.checkpointText} - End trigger reached!");
+            Debug.Log($"{cp.checkpointSprite?.name ?? "Checkpoint"} - End trigger reached!");
         }
     }
 
-    private IEnumerator FadeCheckpointText(string message)
+    private IEnumerator FadeCheckpointSprite(Sprite sprite)
     {
         isFading = true;
-        checkpointUIText.text = message;
+        checkpointUIImage.sprite = sprite;
 
-        yield return StartCoroutine(FadeTextAlpha(0f, 1f));
+        yield return StartCoroutine(FadeImageAlpha(0f, 1f));
         yield return new WaitForSeconds(displayDuration);
-        yield return StartCoroutine(FadeTextAlpha(1f, 0f));
+        yield return StartCoroutine(FadeImageAlpha(1f, 0f));
 
         isFading = false;
     }
 
-    private IEnumerator FadeTextAlpha(float from, float to)
+    private IEnumerator FadeImageAlpha(float from, float to)
     {
         float elapsed = 0f;
-        Color c = checkpointUIText.color;
+        Color c = checkpointUIImage.color;
 
         while (elapsed < fadeDuration)
         {
             elapsed += Time.deltaTime;
             c.a = Mathf.Lerp(from, to, elapsed / fadeDuration);
-            checkpointUIText.color = c;
+            checkpointUIImage.color = c;
             yield return null;
         }
 
         c.a = to;
-        checkpointUIText.color = c;
+        checkpointUIImage.color = c;
     }
 
     public void RespawnPlayer()
