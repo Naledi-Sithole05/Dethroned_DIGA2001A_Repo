@@ -57,15 +57,21 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Trap") || other.CompareTag("Beam"))
+        if (other.CompareTag("Trap") || other.CompareTag("Beam") || other.CompareTag("Bullet"))
         {
             TakeDamage(1);
+
+            // Destroy bullet after it hits the player (optional)
+            if (other.CompareTag("Bullet"))
+            {
+                Destroy(other.gameObject);
+            }
         }
     }
 
-    void TakeDamage(int damage)
+    private void TakeDamage(int damage)
     {
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -90,26 +96,22 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    void Die()
+    private void Die()
     {
-        //  Respawn using CheckpointManager if available
-#if UNITY_2023_1_OR_NEWER
+
         CheckpointManager checkpointManager = Object.FindFirstObjectByType<CheckpointManager>();
-#else
-        CheckpointManager checkpointManager = FindObjectOfType<CheckpointManager>();
-#endif
+
+        
+
 
         if (checkpointManager != null)
         {
             checkpointManager.RespawnPlayer();
-
-            // Restore full health
             currentHealth = maxHealth;
             healthbar.SetHealth(currentHealth);
         }
         else
         {
-            // Fallback if no checkpoint system exists
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }

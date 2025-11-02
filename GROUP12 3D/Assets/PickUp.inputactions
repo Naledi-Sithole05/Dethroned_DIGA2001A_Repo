@@ -1,0 +1,45 @@
+{
+    "name": "PickUp",
+    "maps": [
+        {
+            "name": "PickUp Input",
+            "id": "2a69a302-4346-4318-a9a5-4cfebd12a912",
+            "actions": [
+                {
+                    "name": "PickUpAction",
+                    "type": "Button",
+                    "id": "408d07e5-5043-4d1c-aeb0-cff449d0a9ac",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "90204330-4179-4146-9e52-3415f9fade54",
+                    "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PickUpAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8961fceb-b7ce-4ecf-9355-a37ee78fd46d",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PickUpAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

@@ -38,6 +38,9 @@ public class FPController : MonoBehaviour
     public float standHeight = 2f;
     public float crouchSpeed = 2.5f;
 
+    [Header("Pickup Settings")]
+    public float pickupRange = 3f;
+
     private CharacterController controller;
     private Vector2 moveInput;
     private Vector2 lookInput;
@@ -107,6 +110,24 @@ public class FPController : MonoBehaviour
             isCrouching = false;
             controller.height = standHeight;
             moveSpeed = defaultMoveSpeed;
+        }
+    }
+
+    public void OnPickUp(InputAction.CallbackContext context)
+    {
+        if (!context.performed) return;
+
+        Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
+        if (Physics.Raycast(ray, out RaycastHit hit, pickupRange))
+        {
+            if (hit.collider.CompareTag("crown") || hit.collider.CompareTag("interact"))
+            {
+                PickUpCrown crown = hit.collider.GetComponent<PickUpCrown>();
+                if (crown != null)
+                    crown.PickUp();
+            }
+
+            // Add additional interactable logic here if needed
         }
     }
 

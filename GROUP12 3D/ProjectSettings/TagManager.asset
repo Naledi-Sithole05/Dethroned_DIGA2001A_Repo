@@ -15,6 +15,9 @@ TagManager:
   - Door
   - Guard
   - JumpBoost
+  - Bullet
+  - Interact
+  - Crown
   layers:
   - Default
   - TransparentFX
