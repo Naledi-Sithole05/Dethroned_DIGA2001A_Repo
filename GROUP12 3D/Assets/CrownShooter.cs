@@ -7,7 +7,8 @@ public class CrownShooter : MonoBehaviour
     public GameObject player;
     public GameObject projectilePrefab;
     public Transform shootPoint;
-    public AudioSource shootAudio; // Add your audio source here
+    public AudioSource shootAudio;
+    public AudioClip shootClip;
 
     [Header("Shooting Settings")]
     public float shootForce = 20f;
@@ -53,25 +54,21 @@ public class CrownShooter : MonoBehaviour
         if (player == null || projectilePrefab == null || shootPoint == null) return;
 
         Vector3 direction = (player.transform.position - shootPoint.position).normalized;
-        RaycastHit hit;
 
-        if (Physics.Raycast(shootPoint.position, direction, out hit))
+        GameObject projectile = Instantiate(projectilePrefab, shootPoint.position, Quaternion.identity);
+        Rigidbody rb = projectile.GetComponent<Rigidbody>();
+
+        if (rb != null)
         {
-            GameObject projectile = Instantiate(projectilePrefab, shootPoint.position, Quaternion.identity);
-            Rigidbody rb = projectile.GetComponent<Rigidbody>();
+            rb.linearVelocity = direction * shootForce;
+        }
 
-            if (rb != null)
-            {
-                rb.linearVelocity = direction * shootForce;
-            }
+        Destroy(projectile, projectileLifetime);
 
-            // Play the shooting sound
-            if (shootAudio != null)
-            {
-                shootAudio.Play();
-            }
-
-            Destroy(projectile, projectileLifetime);
+        // Play the shooting sound manually using PlayOneShot
+        if (shootAudio != null && shootClip != null)
+        {
+            shootAudio.PlayOneShot(shootClip);
         }
     }
 }

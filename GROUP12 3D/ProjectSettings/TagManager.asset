@@ -18,6 +18,8 @@ TagManager:
   - Bullet
   - Interact
   - Crown
+  - crown
+  - interact
   layers:
   - Default
   - TransparentFX
