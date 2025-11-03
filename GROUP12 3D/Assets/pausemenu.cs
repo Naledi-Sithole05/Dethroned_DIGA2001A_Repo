@@ -1,9 +1,31 @@
- using UnityEngine;
+  using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
     [SerializeField] GameObject pauseMenu;
+
+    void Update()
+    {
+        // Check for ESC key press to toggle pause menu
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (pauseMenu.activeInHierarchy)
+            {
+                Resume();
+            }
+            else
+            {
+                Pause();
+            }
+        }
+    }
+
+    void Start()
+    {
+        // Ensure pause menu is hidden when game starts
+        pauseMenu.SetActive(false);
+    }
 
     public void Pause()
     {
@@ -13,7 +35,7 @@ public class PauseMenu : MonoBehaviour
 
     public void Home()
     {
-        SceneManager.LoadScene("mainmenu"); // Fixed scene name
+        SceneManager.LoadScene("mainmenu");
         Time.timeScale = 1;
     }
 
@@ -23,9 +45,11 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1;
     }
 
-    public void Restart() // Renamed from Quit for clarity
+    public void Restart()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        // Get the current active scene name and reload it
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(currentSceneName);
         Time.timeScale = 1;
     }
 }
