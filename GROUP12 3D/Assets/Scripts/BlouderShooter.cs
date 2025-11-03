@@ -1,71 +1,84 @@
 using UnityEngine;
+using System.Collections;
 
 public class Boulder : MonoBehaviour
 {
     [Header("Boulder Settings")]
-    public GameObject boulderPrefab;      // Boulder prefab with Rigidbody
-    public Transform spawnPoint;          // Where boulders spawn from
-    public float boulderSpeed = 10f;      // Launch speed
-    public float fireRate = 1.5f;         // Time between boulders
-    public float boulderLifetime = 5f;    // How long before a boulder disappears
+    public GameObject boulderPrefab;
+    public Transform spawnPoint;
+    public float boulderSpeed = 15f;
+    public float fireRate = 1.5f;
+    public float boulderLifetime = 5f;
+    public float shootingDuration = 10f;
 
     [Header("Checkpoint Settings")]
-    public Collider checkpoint4Trigger;   // Trigger collider for checkpoint 4
-    public string playerTag = "Player";   // Player tag for detection
+    public Collider checkpoint4Trigger;
+    public string playerTag = "Player";
 
-    private bool isActive = false;        // When true, the cannon starts firing
-    private float fireTimer = 0f;
+    [Header("Target Settings")]
+    public Transform player;
+
+    private bool isActive = false;
+    private bool isShooting = false;
 
     void Start()
     {
         if (checkpoint4Trigger != null)
         {
-            // Ensure trigger collider is set correctly
             if (!checkpoint4Trigger.isTrigger)
                 checkpoint4Trigger.isTrigger = true;
 
-            // Add helper trigger script
             CheckpointActivator triggerScript = checkpoint4Trigger.gameObject.AddComponent<CheckpointActivator>();
             triggerScript.Setup(this, playerTag);
         }
     }
 
-    void Update()
+    public void ActivateShooter()
     {
-        if (!isActive) return;
+        isActive = true;
 
-        fireTimer += Time.deltaTime;
-        if (fireTimer >= fireRate)
+        if (!isShooting)
+        {
+            StartCoroutine(FireBouldersContinuously());
+        }
+    }
+
+    private IEnumerator FireBouldersContinuously()
+    {
+        isShooting = true;
+        float timer = 0f;
+
+        while (timer < shootingDuration)
         {
             FireBoulder();
-            fireTimer = 0f;
+            yield return new WaitForSeconds(fireRate);
+            timer += fireRate;
         }
+
+        isShooting = false;
     }
 
     private void FireBoulder()
     {
-        if (boulderPrefab == null || spawnPoint == null) return;
+        if (boulderPrefab == null || spawnPoint == null || player == null) return;
 
-        // Spawn the boulder
+        Vector3 targetPos = player.position + Vector3.up * 1.2f;
+        spawnPoint.LookAt(targetPos);
+
         GameObject boulder = Instantiate(boulderPrefab, spawnPoint.position, spawnPoint.rotation);
         Rigidbody rb = boulder.GetComponent<Rigidbody>();
 
         if (rb != null)
         {
-#if UNITY_6000_0_OR_NEWER
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.linearDamping = 0.1f;
+            rb.angularDamping = 0.05f;
+
             rb.linearVelocity = spawnPoint.forward * boulderSpeed;
-#else
-            rb.velocity = spawnPoint.forward * boulderSpeed;
-#endif
         }
 
-        // Destroy the boulder after its lifetime
         Destroy(boulder, boulderLifetime);
-    }
-
-    public void ActivateShooter()
-    {
-        isActive = true;
     }
 }
 
@@ -85,7 +98,7 @@ public class CheckpointActivator : MonoBehaviour
         if (other.CompareTag(playerTag))
         {
             boulderShooter.ActivateShooter();
-            gameObject.SetActive(false); // Disable trigger so it only activates once
+            gameObject.SetActive(false);
         }
     }
 }
