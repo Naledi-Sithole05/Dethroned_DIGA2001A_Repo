@@ -9,53 +9,67 @@ public class Boulder : MonoBehaviour
     public float boulderSpeed = 15f;
     public float fireRate = 1.5f;
     public float boulderLifetime = 5f;
-    public float shootingDuration = 10f;
 
     [Header("Checkpoint Settings")]
-    public Collider checkpoint4Trigger;
+    public Collider checkpoint4StartTrigger;  // The trigger that starts shooting
+    public Collider checkpoint4EndTrigger;    // The trigger that stops shooting
     public string playerTag = "Player";
 
     [Header("Target Settings")]
     public Transform player;
 
-    private bool isActive = false;
     private bool isShooting = false;
+    private Coroutine shootingCoroutine;
 
     void Start()
     {
-        if (checkpoint4Trigger != null)
+        // Setup start trigger
+        if (checkpoint4StartTrigger != null)
         {
-            if (!checkpoint4Trigger.isTrigger)
-                checkpoint4Trigger.isTrigger = true;
+            if (!checkpoint4StartTrigger.isTrigger)
+                checkpoint4StartTrigger.isTrigger = true;
 
-            CheckpointActivator triggerScript = checkpoint4Trigger.gameObject.AddComponent<CheckpointActivator>();
-            triggerScript.Setup(this, playerTag);
+            CheckpointActivator startTriggerScript = checkpoint4StartTrigger.gameObject.AddComponent<CheckpointActivator>();
+            startTriggerScript.Setup(this, playerTag, true);  // true = start
+        }
+
+        // Setup end trigger
+        if (checkpoint4EndTrigger != null)
+        {
+            if (!checkpoint4EndTrigger.isTrigger)
+                checkpoint4EndTrigger.isTrigger = true;
+
+            CheckpointActivator endTriggerScript = checkpoint4EndTrigger.gameObject.AddComponent<CheckpointActivator>();
+            endTriggerScript.Setup(this, playerTag, false);  // false = stop
         }
     }
 
     public void ActivateShooter()
     {
-        isActive = true;
-
         if (!isShooting)
         {
-            StartCoroutine(FireBouldersContinuously());
+            isShooting = true;
+            shootingCoroutine = StartCoroutine(FireBouldersContinuously());
+        }
+    }
+
+    public void DeactivateShooter()
+    {
+        if (isShooting)
+        {
+            isShooting = false;
+            if (shootingCoroutine != null)
+                StopCoroutine(shootingCoroutine);
         }
     }
 
     private IEnumerator FireBouldersContinuously()
     {
-        isShooting = true;
-        float timer = 0f;
-
-        while (timer < shootingDuration)
+        while (isShooting)
         {
             FireBoulder();
             yield return new WaitForSeconds(fireRate);
-            timer += fireRate;
         }
-
-        isShooting = false;
     }
 
     private void FireBoulder()
@@ -74,7 +88,6 @@ public class Boulder : MonoBehaviour
             rb.useGravity = true;
             rb.linearDamping = 0.1f;
             rb.angularDamping = 0.05f;
-
             rb.linearVelocity = spawnPoint.forward * boulderSpeed;
         }
 
@@ -86,19 +99,23 @@ public class CheckpointActivator : MonoBehaviour
 {
     private Boulder boulderShooter;
     private string playerTag;
+    private bool startTrigger;
 
-    public void Setup(Boulder shooterRef, string tag)
+    public void Setup(Boulder shooterRef, string tag, bool isStart)
     {
         boulderShooter = shooterRef;
         playerTag = tag;
+        startTrigger = isStart;
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag(playerTag))
         {
-            boulderShooter.ActivateShooter();
-            gameObject.SetActive(false);
+            if (startTrigger)
+                boulderShooter.ActivateShooter();
+            else
+                boulderShooter.DeactivateShooter();
         }
     }
 }

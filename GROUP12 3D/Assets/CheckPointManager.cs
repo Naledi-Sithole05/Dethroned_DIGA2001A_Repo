@@ -9,11 +9,12 @@ public class CheckpointManager : MonoBehaviour
     {
         public Collider startTrigger;
         public Collider endTrigger;
-        public Sprite checkpointSprite; // Sprite to show on UI
+        public Sprite checkpointSprite;
+        [HideInInspector] public bool isActive = true; // Active until end trigger
     }
 
     public Checkpoint[] checkpoints;
-    public Image checkpointUIImage; // Reference to the UI Image in Canvas
+    public Image checkpointUIImage;
     public float displayDuration = 2f;
     public float fadeDuration = 1f;
 
@@ -53,6 +54,9 @@ public class CheckpointManager : MonoBehaviour
 
     public void TriggerCheckpoint(Checkpoint cp, bool isStart)
     {
+        if (!cp.isActive)
+            return; // Disabled checkpoints do nothing
+
         if (isStart)
         {
             lastCheckpointPosition = cp.startTrigger.transform.position;
@@ -63,7 +67,8 @@ public class CheckpointManager : MonoBehaviour
         }
         else
         {
-            Debug.Log($"{cp.checkpointSprite?.name ?? "Checkpoint"} - End trigger reached!");
+            
+            cp.isActive = false;
         }
     }
 
