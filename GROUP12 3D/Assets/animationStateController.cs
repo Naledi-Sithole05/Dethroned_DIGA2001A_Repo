@@ -4,18 +4,22 @@ public class animationStateController : MonoBehaviour
 {
     Animator animator;
     int isWalkingHash;
+    int isJumpingHash;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         animator = GetComponent<Animator>();
         isWalkingHash = Animator.StringToHash("isWalking");
+        isJumpingHash = Animator.StringToHash("isJumping");
     }
 
     // Update is called once per frame
     void Update()
     {
         bool isWalking = animator.GetBool(isWalkingHash);
+        bool isJumping = animator.GetBool(isJumpingHash);
         bool forwardPressed = Input.GetKey("w");
+        bool jumpPressed = Input.GetKey("space");
 
         if (!isWalking && forwardPressed)
         {
@@ -26,7 +30,21 @@ public class animationStateController : MonoBehaviour
         if (isWalking && !forwardPressed)
         {
             animator.SetBool(isWalkingHash, false);
+
         }
+
+        if (isWalking && (forwardPressed && jumpPressed))
+        {
+          animator.SetBool (isJumpingHash, true);
+        }
+
+        if (isWalking && (!forwardPressed || !jumpPressed))
+        {
+            animator.SetBool(isJumpingHash, false);
+        }
+
+
     }
 
 }
+
