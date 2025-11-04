@@ -21,6 +21,7 @@ TagManager:
   - crown
   - interact
   - Pit
+  - CheckPoint
   layers:
   - Default
   - TransparentFX

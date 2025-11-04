@@ -4,20 +4,26 @@ using UnityEngine.SceneManagement;
 public class PickUpCrown : MonoBehaviour
 {
     [Header("UI References")]
-    public GameObject pickUpText;      // Text displayed when near crown
-    public GameObject exitText;        // Text telling player to exit castle
-    public GameObject CrownOnPlayer;   // Crown object that will appear on player
+    public GameObject pickUpText;       // Text displayed when near crown
+    public GameObject exitText;         // Text telling player to exit castle
+    public GameObject CrownOnPlayer;    // Optional reference if you have a visible crown on player
 
     [Header("Audio Settings")]
-    public AudioSource crownAudio;
+    public AudioSource crownAudio;      // Assign clip here
 
     [Header("Scene Settings")]
     public string nextSceneName = "Level2";
 
-    [Header("Shooter Settings")]
-    public CrownShooter shooter;
+    [Header("Shooter Reference")]
+    public CrownShooter shooter;        // Reference to your cannon shooter
 
     private bool hasCrown = false;
+    private bool playerInRange = false;
+    private Transform playerTransform;
+
+    // Variables for "world-locked follow" behavior
+    private Vector3 pickupOffset;
+    private Quaternion worldRotation;
 
     private void Start()
     {
@@ -27,56 +33,89 @@ public class PickUpCrown : MonoBehaviour
         if (exitText != null)
             exitText.SetActive(false);
 
-        if (CrownOnPlayer != null)
-            CrownOnPlayer.SetActive(false);
-
         if (crownAudio != null)
             crownAudio.playOnAwake = false;
     }
 
-    /// <summary>
-    /// Call this from FPController when player presses the pickup button while in range
-    /// </summary>
-    public void PickUp()
+    private void Update()
     {
-        if (hasCrown)
-            return;
+        // Follow player's position once the crown is picked up
+        if (hasCrown && playerTransform != null)
+        {
+            transform.position = playerTransform.position + pickupOffset;
+            transform.rotation = worldRotation;
+        }
 
-        if (crownAudio != null && crownAudio.clip != null)
-            AudioSource.PlayClipAtPoint(crownAudio.clip, transform.position);
-
-        if (CrownOnPlayer != null)
-            CrownOnPlayer.SetActive(true);
-
-        if (pickUpText != null)
-            pickUpText.SetActive(false);
-
-        if (exitText != null)
-            exitText.SetActive(true);
-
-        hasCrown = true;
-
-        if (shooter != null)
-            shooter.ActivateShooter();
-
-        gameObject.SetActive(false); // hide the world crown
+        // Check pickup input when player is in range
+        if (playerInRange && !hasCrown && Input.GetKeyDown(KeyCode.E))
+        {
+            PickUp();
+        }
     }
 
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !hasCrown)
         {
+            playerInRange = true;
+            playerTransform = other.transform;
+
             if (pickUpText != null)
                 pickUpText.SetActive(true);
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Player") && !hasCrown && pickUpText != null)
-            pickUpText.SetActive(false);
+            pickUpText.SetActive(true);
     }
 
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player") && !hasCrown)
+        {
+            playerInRange = false;
+            if (pickUpText != null)
+                pickUpText.SetActive(false);
+        }
+    }
+
+    private void PickUp()
+    {
+        // Play pickup sound
+        if (crownAudio != null && crownAudio.clip != null)
+            AudioSource.PlayClipAtPoint(crownAudio.clip, transform.position);
+
+        // UI changes
+        if (pickUpText != null)
+            pickUpText.SetActive(false);
+        if (exitText != null)
+            exitText.SetActive(true);
+
+        // Optional: if you have a player crown object
+        if (CrownOnPlayer != null)
+            CrownOnPlayer.SetActive(false);
+
+        // Disable collider so it can't be picked up again
+        Collider col = GetComponent<Collider>();
+        if (col != null)
+            col.enabled = false;
+
+        // Save current offset from player and rotation so it follows properly
+        pickupOffset = transform.position - playerTransform.position;
+        worldRotation = transform.rotation;
+
+        hasCrown = true;
+
+        //  Activate the cannon shooter
+        if (shooter != null)
+            shooter.ActivateShooter();
+
+        Debug.Log("Crown picked up: now moves with player but ignores camera rotation. Shooter activated.");
+    }
+
+    // Trigger for mission completion
     public void CompleteMission()
     {
         if (hasCrown)
