@@ -22,6 +22,7 @@ TagManager:
   - interact
   - Pit
   - CheckPoint
+  - Checkpoint
   layers:
   - Default
   - TransparentFX
