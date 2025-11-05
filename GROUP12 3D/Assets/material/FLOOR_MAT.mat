@@ -37,6 +37,22 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _DIFFUSE:
+        m_Texture: {fileID: 2800000, guid: ef11280ca91954048a97c641c84b7942, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NORMAL:
+        m_Texture: {fileID: 2800000, guid: 6b8eccbeffc2c8e46af0b375cf2bf5c5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PUDDLES:
+        m_Texture: {fileID: 2800000, guid: c74e0d0bbbbb7c945b178bc9afee955f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RIPPLE:
+        m_Texture: {fileID: 2800000, guid: 9dae7e1d7533d5a498c20d2603961579, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -51,8 +67,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _FLOW: 0
+    - _FLOW_TILING: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    m_Colors: []
+    m_Colors:
+    - _MAINTILING: {r: 14.81, g: 23.4, b: 0, a: 0}
+    - _RIPPLE_SPEED: {r: 7.65, g: 8.23, b: 0, a: 0}
+    - _RIPPLE_TILING: {r: 16.68, g: 20.7, b: 0, a: 0}
+    - _SMOOTHTILING: {r: 7.3, g: 2.19, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
