@@ -11,12 +11,16 @@ public class Boulder : MonoBehaviour
     public float boulderLifetime = 5f;
 
     [Header("Checkpoint Settings")]
-    public Collider checkpoint4StartTrigger;  // The trigger that starts shooting
-    public Collider checkpoint4EndTrigger;    // The trigger that stops shooting
+    public Collider checkpoint4StartTrigger;  
+    public Collider checkpoint4EndTrigger;    
     public string playerTag = "Player";
 
     [Header("Target Settings")]
     public Transform player;
+
+    [Header("Audio Settings")]
+    public AudioSource cannonAudio;   
+    public AudioClip fireSound;       
 
     private bool isShooting = false;
     private Coroutine shootingCoroutine;
@@ -30,7 +34,7 @@ public class Boulder : MonoBehaviour
                 checkpoint4StartTrigger.isTrigger = true;
 
             CheckpointActivator startTriggerScript = checkpoint4StartTrigger.gameObject.AddComponent<CheckpointActivator>();
-            startTriggerScript.Setup(this, playerTag, true);  // true = start
+            startTriggerScript.Setup(this, playerTag, true);  
         }
 
         // Setup end trigger
@@ -40,7 +44,7 @@ public class Boulder : MonoBehaviour
                 checkpoint4EndTrigger.isTrigger = true;
 
             CheckpointActivator endTriggerScript = checkpoint4EndTrigger.gameObject.AddComponent<CheckpointActivator>();
-            endTriggerScript.Setup(this, playerTag, false);  // false = stop
+            endTriggerScript.Setup(this, playerTag, false);  
         }
     }
 
@@ -89,6 +93,12 @@ public class Boulder : MonoBehaviour
             rb.linearDamping = 0.1f;
             rb.angularDamping = 0.05f;
             rb.linearVelocity = spawnPoint.forward * boulderSpeed;
+        }
+
+        //  Play cannon firing sound
+        if (cannonAudio != null && fireSound != null)
+        {
+            cannonAudio.PlayOneShot(fireSound);
         }
 
         Destroy(boulder, boulderLifetime);
