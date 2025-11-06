@@ -18,6 +18,10 @@ public class CheckpointManager : MonoBehaviour
     public float displayDuration = 2f;
     public float fadeDuration = 1f;
 
+    [Header("Respawn Sound Settings")]
+    public AudioSource audioSource;       // Assign in Inspector
+    public AudioClip respawnSound;        // Assign in Inspector
+
     private bool isFading = false;
     private Transform player;
     private Vector3 lastCheckpointPosition;
@@ -67,7 +71,6 @@ public class CheckpointManager : MonoBehaviour
         }
         else
         {
-            
             cp.isActive = false;
         }
     }
@@ -124,6 +127,12 @@ public class CheckpointManager : MonoBehaviour
 
             if (controller != null)
                 controller.enabled = true;
+
+            //  Play respawn sound here
+            if (audioSource != null && respawnSound != null)
+            {
+                audioSource.PlayOneShot(respawnSound);
+            }
         }
         else
         {
