@@ -1,4 +1,4 @@
- using UnityEngine;
+  using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
 using System.Collections;
@@ -13,7 +13,9 @@ public class VideoOpeningScene : MonoBehaviour
     [Header("UI Elements")]
     public Button playButton; // Button to go to next scene
     public Button rewatchButton; // Button to replay the video
-    public GameObject buttonsParent; // Parent object for both buttons
+    public Button skipButton; // Button to skip the video
+    public GameObject buttonsParent; // Parent object for play/rewatch buttons
+    public GameObject skipButtonObject; // Separate reference for skip button
     
     [Header("Scene Settings")]
     public string nextSceneName = "SampleScene"; // Change this to your actual scene name
@@ -25,8 +27,9 @@ public class VideoOpeningScene : MonoBehaviour
                                                      (int)videoDisplay.rectTransform.rect.height, 24);
         videoDisplay.texture = videoPlayer.targetTexture;
         
-        // Hide buttons initially
+        // Hide end buttons initially, BUT SHOW SKIP BUTTON
         buttonsParent.SetActive(false);
+        skipButtonObject.SetActive(true); // Skip button is visible from the start
         
         // Add event for when video finishes
         videoPlayer.loopPointReached += OnVideoFinished;
@@ -34,6 +37,7 @@ public class VideoOpeningScene : MonoBehaviour
         // Set up button click handlers
         playButton.onClick.AddListener(OnPlayButtonClicked);
         rewatchButton.onClick.AddListener(OnRewatchButtonClicked);
+        skipButton.onClick.AddListener(OnSkipButtonClicked);
         
         // Start playing video
         videoPlayer.Play();
@@ -42,24 +46,39 @@ public class VideoOpeningScene : MonoBehaviour
     void OnVideoFinished(VideoPlayer vp)
     {
         // Show buttons when video ends
-        buttonsParent.SetActive(true);
+        ShowEndButtons();
+    }
+    
+    // Skip button handler - skip directly to end buttons
+    public void OnSkipButtonClicked()
+    {
+        // Stop the video
+        videoPlayer.Stop();
         
-        // Optional: Add fade-in animation
+        // Show the end buttons (play and rewatch) and hide skip button
+        ShowEndButtons();
+    }
+    
+    // Helper method to show end buttons
+    private void ShowEndButtons()
+    {
+        buttonsParent.SetActive(true);
+        skipButtonObject.SetActive(false); // Hide skip button when video ends
         StartCoroutine(FadeInButtons());
     }
     
     // Play button handler - go to next scene
     public void OnPlayButtonClicked()
     {
-        // Load next scene - MAKE SURE THIS SCENE NAME EXISTS IN YOUR BUILD SETTINGS
         SceneManager.LoadScene(nextSceneName);
     }
     
     // Rewatch button handler - replay the video
     public void OnRewatchButtonClicked()
     {
-        // Hide buttons
+        // Hide end buttons and show skip button again
         buttonsParent.SetActive(false);
+        skipButtonObject.SetActive(true);
         
         // Rewind and play video again
         videoPlayer.Stop();
@@ -97,5 +116,6 @@ public class VideoOpeningScene : MonoBehaviour
         // Remove button listeners
         playButton.onClick.RemoveListener(OnPlayButtonClicked);
         rewatchButton.onClick.RemoveListener(OnRewatchButtonClicked);
+        skipButton.onClick.RemoveListener(OnSkipButtonClicked);
     }
 }
