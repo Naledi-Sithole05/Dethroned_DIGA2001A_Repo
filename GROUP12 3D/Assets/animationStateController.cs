@@ -3,6 +3,7 @@ using UnityEngine;
 public class animationStateController : MonoBehaviour
 {
     Animator animator;
+    public CharacterController _Carr;
     int isWalkingHash;
     int isJumpingHash;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -33,12 +34,12 @@ public class animationStateController : MonoBehaviour
 
         }
 
-        if (isWalking && (forwardPressed && jumpPressed))
+        if  (jumpPressed)
         {
           animator.SetBool (isJumpingHash, true);
         }
 
-        if (isWalking && (!forwardPressed || !jumpPressed))
+        if (_Carr.isGrounded)
         {
             animator.SetBool(isJumpingHash, false);
         }
