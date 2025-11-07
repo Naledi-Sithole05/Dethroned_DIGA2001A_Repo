@@ -3,7 +3,7 @@ using UnityEngine;
 public class animationStateController : MonoBehaviour
 {
     Animator animator;
-    public CharacterController _Carr;
+    public CharacterController _Player;
     int isWalkingHash;
     int isJumpingHash;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -39,7 +39,7 @@ public class animationStateController : MonoBehaviour
           animator.SetBool (isJumpingHash, true);
         }
 
-        if (_Carr.isGrounded)
+        if (_Player.isGrounded)
         {
             animator.SetBool(isJumpingHash, false);
         }
