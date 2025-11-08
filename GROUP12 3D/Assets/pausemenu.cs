@@ -7,28 +7,42 @@ public class PauseMenu : MonoBehaviour
 
     void Update()
     {
-        // Check for ESC key press to toggle pause menu
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (pauseMenu.activeInHierarchy)
+            Debug.Log("ESC pressed"); // Add this line
+            
+            if (pauseMenu != null)
             {
-                Resume();
+                if (pauseMenu.activeInHierarchy)
+                {
+                    Resume();
+                }
+                else
+                {
+                    Pause();
+                }
             }
             else
             {
-                Pause();
+                Debug.LogError("PauseMenu reference is null!");
             }
         }
     }
 
     void Start()
     {
-        // Ensure pause menu is hidden when game starts
+        if (pauseMenu == null)
+        {
+            Debug.LogError("PauseMenu reference not set in Inspector!");
+            return;
+        }
+        
         pauseMenu.SetActive(false);
     }
 
     public void Pause()
     {
+        Debug.Log("Pausing game");
         pauseMenu.SetActive(true);
         Time.timeScale = 0;
     }
@@ -41,13 +55,13 @@ public class PauseMenu : MonoBehaviour
 
     public void Resume()
     {
+        Debug.Log("Resuming game");
         pauseMenu.SetActive(false);
         Time.timeScale = 1;
     }
 
     public void Restart()
     {
-        // Get the current active scene name and reload it
         string currentSceneName = SceneManager.GetActiveScene().name;
         SceneManager.LoadScene(currentSceneName);
         Time.timeScale = 1;

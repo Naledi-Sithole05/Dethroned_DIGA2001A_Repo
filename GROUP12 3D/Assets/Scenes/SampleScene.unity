@@ -62248,6 +62248,7 @@ GameObject:
   - component: {fileID: 264709007}
   - component: {fileID: 264709009}
   - component: {fileID: 264709008}
+  - component: {fileID: 264709010}
   m_Layer: 5
   m_Name: pausemenu
   m_TagString: Untagged
@@ -62315,6 +62316,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 264709006}
   m_CullTransparentMesh: 1
+--- !u!114 &264709010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 264709006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3145ab4bb319a042b9d4a1531f7253f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pauseMenu: {fileID: 264709006}
 --- !u!1 &266268498 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7333631254909853010, guid: e4d72e77f06d9204dadfd8c1c2d875ef, type: 3}
@@ -255161,10 +255175,12 @@ MonoBehaviour:
     wrongMaterial: {fileID: 2100000, guid: d052b4c58c3f6d74a9a23eab1ecf3d97, type: 2}
     isActiveInPattern: 0
     isSteppedOn: 0
-  patternDisplayTime: 5
+  patternDisplayTime: 4
   colorChangeDuration: 0.5
   player: {fileID: 1552845012}
   startPosition: {fileID: 437712353}
+  showInstructions: 1
+  instructionMessage: Watch the pattern! Press SPACE to start.
 --- !u!4 &822380700
 Transform:
   m_ObjectHideFlags: 0

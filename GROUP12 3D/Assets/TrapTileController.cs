@@ -25,11 +25,16 @@ public class TrapTileController : MonoBehaviour
     public GameObject player;
     public Transform startPosition;
 
+    [Header("Instructions")]
+    public bool showInstructions = true;
+    public string instructionMessage = "Watch the pattern! Press SPACE to start.";
+
     private List<int> currentPattern = new List<int>();
     private int currentStep = 0;
     private bool patternActive = false;
     private bool playerInTrigger = false;
     private bool patternDisplaying = false;
+    private bool hasShownInstructions = false;
 
     void Start()
     {
@@ -57,7 +62,13 @@ public class TrapTileController : MonoBehaviour
         if (other.gameObject == player)
         {
             playerInTrigger = true;
-            if (!patternActive && !patternDisplaying)
+            
+            if (!patternActive && !patternDisplaying && showInstructions && !hasShownInstructions)
+            {
+                ShowInstructions();
+                hasShownInstructions = true;
+            }
+            else if (!patternActive && !patternDisplaying)
             {
                 Debug.Log("Press SPACE to start the pattern sequence");
             }
@@ -70,6 +81,14 @@ public class TrapTileController : MonoBehaviour
         {
             playerInTrigger = false;
         }
+    }
+
+    void ShowInstructions()
+    {
+        Debug.Log("Watch carefully! The tiles will light up in a pattern. Remember the sequence and step on them in the correct order. Press SPACE to start when you're ready.");
+        
+        // You can also show on-screen text here if you want
+        // StartCoroutine(ShowTemporaryMessage(instructionMessage, 5f));
     }
 
     public void StartPatternSequence()
@@ -117,6 +136,9 @@ public class TrapTileController : MonoBehaviour
             playerMovement.enabled = false;
 
         Debug.Log("Watch the pattern carefully!");
+
+        // Wait a moment before starting pattern
+        yield return new WaitForSeconds(1f);
 
         // Display the pattern
         foreach (int tileIndex in currentPattern)
@@ -203,6 +225,7 @@ public class TrapTileController : MonoBehaviour
         patternActive = false;
         currentPattern.Clear();
         currentStep = 0;
+        hasShownInstructions = false; // Reset so instructions show again if player comes back
 
         // Optional: Make all tiles safe color for a moment
         StartCoroutine(SuccessFlash());
@@ -252,6 +275,7 @@ public class TrapTileController : MonoBehaviour
         patternActive = false;
         currentPattern.Clear();
         currentStep = 0;
+        hasShownInstructions = false; // Reset so instructions show again
 
         // Reset all tiles to default material
         foreach (TileData tile in tiles)
@@ -292,6 +316,23 @@ public class TrapTileController : MonoBehaviour
         if (playerMovement != null)
             playerMovement.enabled = true;
 
-        Debug.Log("Ready to try again! Press SPACE to start new pattern.");
+        // Show instructions again after reset
+        if (showInstructions)
+        {
+            ShowInstructions();
+        }
+        else
+        {
+            Debug.Log("Ready to try again! Press SPACE to start new pattern.");
+        }
+    }
+
+    // Optional: Method to show temporary on-screen message
+    private IEnumerator ShowTemporaryMessage(string message, float duration)
+    {
+        // You can implement GUI drawing here if needed
+        Debug.Log(message);
+        yield return new WaitForSeconds(duration);
+        // Hide message logic here
     }
 }
