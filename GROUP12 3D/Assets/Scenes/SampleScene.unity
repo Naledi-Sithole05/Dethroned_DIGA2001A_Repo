@@ -61340,6 +61340,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d47d8df079b22e0459902b0fa91d0833, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -61626,23 +61630,18 @@ MonoBehaviour:
   jumpHeight: 1.5
   gravity: -25
   jumpSpeedMultiplier: 1.5
-  boostSpeed: 12
-  boostDuration: 5
-  jumpBoostMultiplier: 2
-  jumpBoostDuration: 5
-  isInvisible: 0
-  boostSlider: {fileID: 0}
-  interactText: {fileID: 0}
   cameraTransform: {fileID: 0}
   lookSensitivity: 2
   verticalLookLimit: 90
   crouchHeight: 1
   standHeight: 2
   crouchSpeed: 2.5
-  throwPoint: {fileID: 0}
-  throwForce: 10
+  holdPoint: {fileID: 0}
   pickupRange: 3
-  holdSmoothness: 10
+  throwForwardForce: 10
+  throwUpwardForce: 5
+  interactText: {fileID: 0}
+  throwText: {fileID: 0}
 --- !u!143 &237948416
 CharacterController:
   m_ObjectHideFlags: 0
@@ -61685,23 +61684,18 @@ MonoBehaviour:
   jumpHeight: 1.5
   gravity: -25
   jumpSpeedMultiplier: 1.5
-  boostSpeed: 12
-  boostDuration: 5
-  jumpBoostMultiplier: 2
-  jumpBoostDuration: 5
-  isInvisible: 0
-  boostSlider: {fileID: 0}
-  interactText: {fileID: 0}
   cameraTransform: {fileID: 0}
   lookSensitivity: 2
   verticalLookLimit: 90
   crouchHeight: 1
   standHeight: 2
   crouchSpeed: 2.5
-  throwPoint: {fileID: 0}
-  throwForce: 10
+  holdPoint: {fileID: 0}
   pickupRange: 3
-  holdSmoothness: 10
+  throwForwardForce: 10
+  throwUpwardForce: 5
+  interactText: {fileID: 0}
+  throwText: {fileID: 0}
 --- !u!143 &237948418
 CharacterController:
   m_ObjectHideFlags: 0
@@ -73972,6 +73966,37 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!1 &305470104
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 305470105}
+  m_Layer: 0
+  m_Name: FPS camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &305470105
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 305470104}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.10556793, y: -0.023, z: 3.99}
+  m_LocalScale: {x: 0.14089419, y: 0.037298277, z: 0.18962325}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 330585546}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &306154668
 GameObject:
   m_ObjectHideFlags: 0
@@ -79534,6 +79559,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1379872745}
+  - {fileID: 305470105}
   m_Father: {fileID: 1552845016}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &330585547
@@ -207990,7 +208016,7 @@ GameObject:
   - component: {fileID: 694293079}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: interact
+  m_TagString: Interact
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -208010,7 +208036,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -208078,33 +208104,39 @@ Transform:
   m_GameObject: {fileID: 694293074}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 210.79732, y: 31.29, z: 195.61925}
-  m_LocalScale: {x: 5.0946226, y: 5.133087, z: 11.814813}
+  m_LocalPosition: {x: 210.79732, y: 26.249, z: 195.61925}
+  m_LocalScale: {x: 5.0946226, y: 32.773544, z: 11.814813}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &694293079
-BoxCollider:
+--- !u!54 &694293079
+Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 694293074}
-  m_Material: {fileID: 0}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.4423577, y: 1, z: 1.302382}
-  m_Center: {x: -0.00055114104, y: 0, z: -0.02871812}
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &698653430
 GameObject:
   m_ObjectHideFlags: 0
@@ -285473,7 +285505,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &949821544
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -469906,7 +469938,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 7cc4e4908190dd548a5daa67b098c0d8, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -480804,23 +480836,18 @@ MonoBehaviour:
   jumpHeight: 5
   gravity: -30
   jumpSpeedMultiplier: 1.1
-  boostSpeed: 100
-  boostDuration: 5
-  jumpBoostMultiplier: 2
-  jumpBoostDuration: 5
-  isInvisible: 0
-  boostSlider: {fileID: 1427649307}
-  interactText: {fileID: 220213442}
   cameraTransform: {fileID: 330585546}
   lookSensitivity: 0.49
   verticalLookLimit: 55
   crouchHeight: 0.8
   standHeight: 2
   crouchSpeed: 3.61
-  throwPoint: {fileID: 1552845016}
-  throwForce: 10
-  pickupRange: 3
-  holdSmoothness: 10
+  holdPoint: {fileID: 305470105}
+  pickupRange: 15
+  throwForwardForce: 15
+  throwUpwardForce: 5
+  interactText: {fileID: 220213442}
+  throwText: {fileID: 1767632309}
 --- !u!114 &1552845018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -483446,6 +483473,7 @@ RectTransform:
   - {fileID: 393912863}
   - {fileID: 1692364892}
   - {fileID: 220213441}
+  - {fileID: 1767632311}
   - {fileID: 43590211}
   - {fileID: 1427649306}
   - {fileID: 1714953427}
@@ -530264,6 +530292,144 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!1 &1767632308
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1767632311}
+  - component: {fileID: 1767632310}
+  - component: {fileID: 1767632309}
+  m_Layer: 5
+  m_Name: PickUpText (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1767632309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1767632308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: 'Press G/ North Button to Throw
+
+'
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 36
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 1
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: -186.64026, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1767632310
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1767632308}
+  m_CullTransparentMesh: 1
+--- !u!224 &1767632311
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1767632308}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.17, y: 1.07, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1605639729}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -3, y: -185}
+  m_SizeDelta: {x: 200, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1769090535
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -530550,23 +530716,18 @@ MonoBehaviour:
   jumpHeight: 1.5
   gravity: -25
   jumpSpeedMultiplier: 1.5
-  boostSpeed: 12
-  boostDuration: 5
-  jumpBoostMultiplier: 2
-  jumpBoostDuration: 5
-  isInvisible: 0
-  boostSlider: {fileID: 0}
-  interactText: {fileID: 0}
   cameraTransform: {fileID: 0}
   lookSensitivity: 2
   verticalLookLimit: 90
   crouchHeight: 1
   standHeight: 2
   crouchSpeed: 2.5
-  throwPoint: {fileID: 0}
-  throwForce: 10
+  holdPoint: {fileID: 0}
   pickupRange: 3
-  holdSmoothness: 10
+  throwForwardForce: 10
+  throwUpwardForce: 5
+  interactText: {fileID: 0}
+  throwText: {fileID: 0}
 --- !u!95 &1774569629
 Animator:
   serializedVersion: 7

@@ -1,10 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
-using System.Collections;
-using TMPro;  
-
-
+using TMPro;
 
 [RequireComponent(typeof(CharacterController))]
 public class FPController : MonoBehaviour
@@ -16,22 +12,6 @@ public class FPController : MonoBehaviour
     public float gravity = -25f;
     public float jumpSpeedMultiplier = 1.5f;
 
-    [Header("Speed Boost Settings")]
-    public float boostSpeed = 12f;
-    public float boostDuration = 5f;
-
-    [Header("Jump Boost Settings")]
-    public float jumpBoostMultiplier = 2f;
-    public float jumpBoostDuration = 5f;
-
-    [Header("Invisibility Settings")]
-    public bool isInvisible = false;
-    private float invisibilityTimer = 0f;
-
-    [Header("UI Settings")]
-    public Slider boostSlider;
-    public TMP_Text interactText;
-
     [Header("Look Settings")]
     public Transform cameraTransform;
     public float lookSensitivity = 2f;
@@ -42,77 +22,81 @@ public class FPController : MonoBehaviour
     public float standHeight = 2f;
     public float crouchSpeed = 2.5f;
 
-    [Header("Throw & Pickup Settings")]
-    public Transform throwPoint;
-    public float throwForce = 10f;
+    [Header("Pickup / Throw Settings")]
+    public Transform holdPoint;           // empty in front of camera
     public float pickupRange = 3f;
-    public float holdSmoothness = 10f;
+    public float throwForwardForce = 10f;
+    public float throwUpwardForce = 5f;
+
+    [Header("UI Settings")]
+    public TMP_Text interactText;         // appears when near object
+    public TMP_Text throwText;            // appears after pickup
 
     private CharacterController controller;
     private Vector2 moveInput;
     private Vector2 lookInput;
     private Vector3 velocity;
-    private float verticalRotation = 0f;
+    private float verticalRotation;
 
     private float defaultMoveSpeed;
-    private float defaultJumpHeight;
     private bool isRunning;
     private bool isCrouching;
-    private bool isBoosted = false;
-    private float remainingBoostTime = 0f;
-    private Coroutine jumpBoostRoutine;
 
+    // Pickup
     private Rigidbody heldObject;
+    private Collider heldCollider;
     private bool isHolding = false;
-    private InteractableObject nearbyObject;
+    private GameObject nearestObject;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
         defaultMoveSpeed = moveSpeed;
-        defaultJumpHeight = jumpHeight;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        if (boostSlider != null)
-            boostSlider.gameObject.SetActive(false);
-
-        if (interactText != null)
-            interactText.gameObject.SetActive(false);
+        if (interactText != null) interactText.gameObject.SetActive(false);
+        if (throwText != null) throwText.gameObject.SetActive(false);
     }
 
     private void Update()
     {
         HandleMovement();
         HandleLook();
-        HandleBoostDecay();
-        HandleInvisibilityTimer();
-        UpdateBoostUI();
+        DetectPickupObject();
+        UpdateHeldObjectPosition();
+    }
 
-        if (isHolding && heldObject != null)
-        {
-            Vector3 targetPos = throwPoint.position;
-            heldObject.MovePosition(Vector3.Lerp(heldObject.position, targetPos, Time.deltaTime * holdSmoothness));
-        }
+   
+
+    private void HandleMovement()
+    {
+        float currentSpeed = isRunning ? runSpeed : moveSpeed;
+        Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
+        controller.Move(move * currentSpeed * Time.deltaTime);
+
+        if (controller.isGrounded && velocity.y < 0) velocity.y = -2f;
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
+    }
+
+    private void HandleLook()
+    {
+        float mouseX = lookInput.x * lookSensitivity;
+        float mouseY = lookInput.y * lookSensitivity;
+
+        verticalRotation -= mouseY;
+        verticalRotation = Mathf.Clamp(verticalRotation, -verticalLookLimit, verticalLookLimit);
+
+        cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
+        transform.Rotate(Vector3.up * mouseX);
     }
 
     
 
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        moveInput = context.ReadValue<Vector2>();
-    }
-
-    public void OnLook(InputAction.CallbackContext context)
-    {
-        lookInput = context.ReadValue<Vector2>();
-    }
-
-    public void OnRun(InputAction.CallbackContext context)
-    {
-        isRunning = context.ReadValueAsButton();
-    }
-
+    public void OnMove(InputAction.CallbackContext context) => moveInput = context.ReadValue<Vector2>();
+    public void OnLook(InputAction.CallbackContext context) => lookInput = context.ReadValue<Vector2>();
+    public void OnRun(InputAction.CallbackContext context) => isRunning = context.ReadValueAsButton();
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.performed && controller.isGrounded)
@@ -137,60 +121,84 @@ public class FPController : MonoBehaviour
 
     public void OnPickUp(InputAction.CallbackContext context)
     {
-        if (context.performed)
-        {
-            if (isHolding)
-                DropObject();
-            else
-                TryPickUpObject();
-        }
+        if (!context.performed) return;
+
+        if (isHolding)
+            DropObject();
+        else if (nearestObject != null)
+            PickUpObject();
     }
 
     public void OnThrow(InputAction.CallbackContext context)
     {
-        if (context.performed && isHolding && heldObject != null)
-            ThrowObject();
+        if (!context.performed) return;
+        if (isHolding) ThrowObject();
     }
 
     
 
-    private void TryPickUpObject()
+    private void DetectPickupObject()
     {
-        if (nearbyObject != null && nearbyObject.CompareTag("Interact"))
-        {
-            Rigidbody rb = nearbyObject.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                heldObject = rb;
-                heldObject.useGravity = false;
-                heldObject.linearDamping = 10f; //  replaced drag
-                heldObject.constraints = RigidbodyConstraints.FreezeRotation;
-                isHolding = true;
+        if (isHolding) return;
 
-                nearbyObject.HidePrompt();
-                nearbyObject = null;
-                Debug.Log("Picked up: " + heldObject.name);
+        Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
+        if (Physics.Raycast(ray, out RaycastHit hit, pickupRange))
+        {
+            if (hit.collider.CompareTag("Interact"))
+            {
+                nearestObject = hit.collider.gameObject;
+                if (interactText != null)
+                {
+                    interactText.text = "Press E or West Button to pick up";
+                    interactText.gameObject.SetActive(true);
+                }
+                return;
             }
         }
-        else
+
+        nearestObject = null;
+        if (interactText != null) interactText.gameObject.SetActive(false);
+    }
+
+    private void PickUpObject()
+    {
+        if (nearestObject == null) return;
+
+        heldObject = nearestObject.GetComponent<Rigidbody>();
+        heldCollider = nearestObject.GetComponent<Collider>();
+        if (heldObject != null && heldCollider != null)
         {
-            Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
-            if (Physics.Raycast(ray, out RaycastHit hit, pickupRange))
+            isHolding = true;
+
+            // Disable gravity, keep Rigidbody non-kinematic
+            heldObject.useGravity = false;
+
+            // Reset velocities safely
+            heldObject.linearVelocity = Vector3.zero;
+            heldObject.angularVelocity = Vector3.zero;
+
+            // Make collider a trigger
+            heldCollider.isTrigger = true;
+
+            // Show throw text
+            if (throwText != null)
             {
-                if (hit.collider.CompareTag("Interact"))
-                {
-                    Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
-                    if (rb != null)
-                    {
-                        heldObject = rb;
-                        heldObject.useGravity = false;
-                        heldObject.linearDamping = 10f;
-                        heldObject.constraints = RigidbodyConstraints.FreezeRotation;
-                        isHolding = true;
-                        Debug.Log("Picked up (via raycast): " + hit.collider.name);
-                    }
-                }
+                throwText.text = "Press 'G' to throw or the North Button";
+                throwText.gameObject.SetActive(true);
             }
+
+            if (interactText != null)
+                interactText.gameObject.SetActive(false);
+        }
+    }
+
+    private void UpdateHeldObjectPosition()
+    {
+        if (isHolding && heldObject != null)
+        {
+            // Smoothly move in front of camera without parenting
+            heldObject.MovePosition(Vector3.Lerp(heldObject.position, holdPoint.position, Time.deltaTime * 10f));
+            heldObject.MoveRotation(Quaternion.Lerp(heldObject.rotation, holdPoint.rotation, Time.deltaTime * 10f));
         }
     }
 
@@ -199,159 +207,33 @@ public class FPController : MonoBehaviour
         if (heldObject != null)
         {
             heldObject.useGravity = true;
-            heldObject.linearDamping = 1f;
-            heldObject.constraints = RigidbodyConstraints.None;
+            heldCollider.isTrigger = false;
             heldObject = null;
+            heldCollider = null;
+            isHolding = false;
         }
-        isHolding = false;
-        Debug.Log("Dropped object.");
+
+        if (throwText != null)
+            throwText.gameObject.SetActive(false);
     }
 
     private void ThrowObject()
     {
-        heldObject.useGravity = true;
-        heldObject.linearDamping = 1f;
-        heldObject.constraints = RigidbodyConstraints.None;
-        heldObject.AddForce(cameraTransform.forward * throwForce, ForceMode.VelocityChange);
-        Debug.Log($"Threw {heldObject.name}");
-        heldObject = null;
-        isHolding = false;
-    }
-
-    
-
-    public void SetNearbyObject(InteractableObject obj)
-    {
-        nearbyObject = obj;
-
-        if (interactText != null && !isHolding)
+        if (heldObject != null)
         {
-            interactText.text = "Press E to pick up";
-            interactText.gameObject.SetActive(true);
-        }
-    }
+            heldObject.useGravity = true;
+            heldCollider.isTrigger = false;
 
-    public void ClearNearbyObject(InteractableObject obj)
-    {
-        if (nearbyObject == obj)
-        {
-            nearbyObject = null;
-            if (interactText != null)
-                interactText.gameObject.SetActive(false);
-        }
-    }
+            // Launch object away from player
+            heldObject.AddForce(cameraTransform.forward * throwForwardForce, ForceMode.Impulse);
+            heldObject.AddForce(cameraTransform.up * throwUpwardForce, ForceMode.Impulse);
 
-    private void HandleMovement()
-    {
-        float currentSpeed = moveSpeed;
+            heldObject = null;
+            heldCollider = null;
+            isHolding = false;
 
-        if (isBoosted)
-            currentSpeed = boostSpeed;
-        else if (isRunning && !isCrouching)
-            currentSpeed = runSpeed;
-
-        Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
-        controller.Move(move * currentSpeed * Time.deltaTime);
-
-        if (controller.isGrounded && velocity.y < 0)
-            velocity.y = -2f;
-
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
-    }
-
-    private void HandleLook()
-    {
-        float mouseX = lookInput.x * lookSensitivity;
-        float mouseY = lookInput.y * lookSensitivity;
-
-        verticalRotation -= mouseY;
-        verticalRotation = Mathf.Clamp(verticalRotation, -verticalLookLimit, verticalLookLimit);
-
-        cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
-        transform.Rotate(Vector3.up * mouseX);
-    }
-
-   
-
-    private void HandleBoostDecay()
-    {
-        if (isBoosted && moveInput.magnitude > 0f)
-        {
-            remainingBoostTime -= Time.deltaTime;
-            if (remainingBoostTime <= 0f)
-            {
-                isBoosted = false;
-                moveSpeed = defaultMoveSpeed;
-
-                if (boostSlider != null)
-                    boostSlider.gameObject.SetActive(false);
-            }
-        }
-    }
-
-    private void UpdateBoostUI()
-    {
-        if (isBoosted && boostSlider != null)
-            boostSlider.value = remainingBoostTime;
-    }
-
-    private void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        if (hit.collider.CompareTag("SpeedBoost"))
-        {
-            isBoosted = true;
-            remainingBoostTime = boostDuration;
-            moveSpeed = boostSpeed;
-
-            if (boostSlider != null)
-            {
-                boostSlider.maxValue = boostDuration;
-                boostSlider.value = boostDuration;
-                boostSlider.gameObject.SetActive(true);
-            }
-
-            Destroy(hit.gameObject);
-        }
-
-        if (hit.collider.CompareTag("JumpBoost"))
-        {
-            ApplyJumpBoost(jumpBoostMultiplier, jumpBoostDuration);
-            JumpBoostPickup pickup = hit.collider.GetComponent<JumpBoostPickup>();
-            if (pickup != null)
-                pickup.StartRespawn();
-        }
-    }
-
-    public void ApplyJumpBoost(float multiplier, float duration)
-    {
-        if (jumpBoostRoutine != null)
-            StopCoroutine(jumpBoostRoutine);
-
-        jumpBoostRoutine = StartCoroutine(JumpBoostRoutine(multiplier, duration));
-    }
-
-    private IEnumerator JumpBoostRoutine(float multiplier, float duration)
-    {
-        jumpHeight = defaultJumpHeight * multiplier;
-        yield return new WaitForSeconds(duration);
-        jumpHeight = defaultJumpHeight;
-        jumpBoostRoutine = null;
-    }
-
-    public void ActivateInvisibility(float duration)
-    {
-        isInvisible = true;
-        invisibilityTimer = duration;
-    }
-
-    private void HandleInvisibilityTimer()
-    {
-        if (isInvisible)
-        {
-            invisibilityTimer -= Time.deltaTime;
-            if (invisibilityTimer <= 0f)
-                isInvisible = false;
+            if (throwText != null)
+                throwText.gameObject.SetActive(false);
         }
     }
 }
