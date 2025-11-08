@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;  
+
+
 
 [RequireComponent(typeof(CharacterController))]
 public class FPController : MonoBehaviour
@@ -27,6 +30,7 @@ public class FPController : MonoBehaviour
 
     [Header("UI Settings")]
     public Slider boostSlider;
+    public TMP_Text interactText;
 
     [Header("Look Settings")]
     public Transform cameraTransform;
@@ -37,6 +41,12 @@ public class FPController : MonoBehaviour
     public float crouchHeight = 1f;
     public float standHeight = 2f;
     public float crouchSpeed = 2.5f;
+
+    [Header("Throw & Pickup Settings")]
+    public Transform throwPoint;
+    public float throwForce = 10f;
+    public float pickupRange = 3f;
+    public float holdSmoothness = 10f;
 
     private CharacterController controller;
     private Vector2 moveInput;
@@ -52,6 +62,10 @@ public class FPController : MonoBehaviour
     private float remainingBoostTime = 0f;
     private Coroutine jumpBoostRoutine;
 
+    private Rigidbody heldObject;
+    private bool isHolding = false;
+    private InteractableObject nearbyObject;
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -62,6 +76,9 @@ public class FPController : MonoBehaviour
 
         if (boostSlider != null)
             boostSlider.gameObject.SetActive(false);
+
+        if (interactText != null)
+            interactText.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -71,7 +88,15 @@ public class FPController : MonoBehaviour
         HandleBoostDecay();
         HandleInvisibilityTimer();
         UpdateBoostUI();
+
+        if (isHolding && heldObject != null)
+        {
+            Vector3 targetPos = throwPoint.position;
+            heldObject.MovePosition(Vector3.Lerp(heldObject.position, targetPos, Time.deltaTime * holdSmoothness));
+        }
     }
+
+    
 
     public void OnMove(InputAction.CallbackContext context)
     {
@@ -110,6 +135,112 @@ public class FPController : MonoBehaviour
         }
     }
 
+    public void OnPickUp(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (isHolding)
+                DropObject();
+            else
+                TryPickUpObject();
+        }
+    }
+
+    public void OnThrow(InputAction.CallbackContext context)
+    {
+        if (context.performed && isHolding && heldObject != null)
+            ThrowObject();
+    }
+
+    
+
+    private void TryPickUpObject()
+    {
+        if (nearbyObject != null && nearbyObject.CompareTag("Interact"))
+        {
+            Rigidbody rb = nearbyObject.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                heldObject = rb;
+                heldObject.useGravity = false;
+                heldObject.linearDamping = 10f; //  replaced drag
+                heldObject.constraints = RigidbodyConstraints.FreezeRotation;
+                isHolding = true;
+
+                nearbyObject.HidePrompt();
+                nearbyObject = null;
+                Debug.Log("Picked up: " + heldObject.name);
+            }
+        }
+        else
+        {
+            Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
+            if (Physics.Raycast(ray, out RaycastHit hit, pickupRange))
+            {
+                if (hit.collider.CompareTag("Interact"))
+                {
+                    Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
+                    if (rb != null)
+                    {
+                        heldObject = rb;
+                        heldObject.useGravity = false;
+                        heldObject.linearDamping = 10f;
+                        heldObject.constraints = RigidbodyConstraints.FreezeRotation;
+                        isHolding = true;
+                        Debug.Log("Picked up (via raycast): " + hit.collider.name);
+                    }
+                }
+            }
+        }
+    }
+
+    private void DropObject()
+    {
+        if (heldObject != null)
+        {
+            heldObject.useGravity = true;
+            heldObject.linearDamping = 1f;
+            heldObject.constraints = RigidbodyConstraints.None;
+            heldObject = null;
+        }
+        isHolding = false;
+        Debug.Log("Dropped object.");
+    }
+
+    private void ThrowObject()
+    {
+        heldObject.useGravity = true;
+        heldObject.linearDamping = 1f;
+        heldObject.constraints = RigidbodyConstraints.None;
+        heldObject.AddForce(cameraTransform.forward * throwForce, ForceMode.VelocityChange);
+        Debug.Log($"Threw {heldObject.name}");
+        heldObject = null;
+        isHolding = false;
+    }
+
+    
+
+    public void SetNearbyObject(InteractableObject obj)
+    {
+        nearbyObject = obj;
+
+        if (interactText != null && !isHolding)
+        {
+            interactText.text = "Press E to pick up";
+            interactText.gameObject.SetActive(true);
+        }
+    }
+
+    public void ClearNearbyObject(InteractableObject obj)
+    {
+        if (nearbyObject == obj)
+        {
+            nearbyObject = null;
+            if (interactText != null)
+                interactText.gameObject.SetActive(false);
+        }
+    }
+
     private void HandleMovement()
     {
         float currentSpeed = moveSpeed;
@@ -140,6 +271,8 @@ public class FPController : MonoBehaviour
         cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
         transform.Rotate(Vector3.up * mouseX);
     }
+
+   
 
     private void HandleBoostDecay()
     {

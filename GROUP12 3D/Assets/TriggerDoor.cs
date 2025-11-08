@@ -9,6 +9,10 @@ public class DoorInteraction : MonoBehaviour
     public string openTrigger = "Open";
     public string closeTrigger = "Close";
 
+    [Header("Audio Settings")]
+    public AudioSource audioSource;
+    public AudioClip doorOpenSound;
+
     [Header("Settings")]
     public bool isOpen = false;
     public float closeDelay = 1f; // Time after leaving before door closes
@@ -20,6 +24,10 @@ public class DoorInteraction : MonoBehaviour
     {
         if (interactionText != null)
             interactionText.gameObject.SetActive(false);
+
+        // Auto-assign AudioSource if missing
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -30,10 +38,14 @@ public class DoorInteraction : MonoBehaviour
 
         if (!isOpen)
         {
-            // Open the door immediately
+            // Open the door
             doorAnimator.SetTrigger(openTrigger);
             isOpen = true;
             Debug.Log("Door opened automatically.");
+
+            // Play door open sound
+            if (audioSource != null && doorOpenSound != null)
+                audioSource.PlayOneShot(doorOpenSound);
 
             if (interactionText != null)
             {

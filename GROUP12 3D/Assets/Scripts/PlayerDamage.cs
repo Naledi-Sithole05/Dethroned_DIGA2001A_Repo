@@ -16,6 +16,12 @@ public class PlayerHealth : MonoBehaviour
     private float wreckingBallDamageCooldown = 1f;
     private float nextDamageTime = 0f;
 
+    [Header("Audio Settings")]
+    public AudioSource audioSource;
+    public AudioClip beamHitSound;
+
+    private bool isBeamTouching = false; // Tracks continuous beam contact
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -27,11 +33,24 @@ public class PlayerHealth : MonoBehaviour
             wreckingBall = wb.transform;
         else
             Debug.LogWarning("No object with tag 'Wrecking Ball' found in scene!");
+
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
         DetectWreckingBall();
+
+        // If the beam is touching, apply slow continuous damage (optional)
+        if (isBeamTouching)
+        {
+            if (Time.time >= nextDamageTime)
+            {
+                TakeDamage(1);
+                nextDamageTime = Time.time + 1f;
+            }
+        }
     }
 
     void DetectWreckingBall()
@@ -63,11 +82,25 @@ public class PlayerHealth : MonoBehaviour
         {
             TakeDamage(1);
 
-            // Destroy bullet after it hits the player (optional)
-            if (other.CompareTag("Bullet"))
+            //  Play beam sound when beam touches player
+            if (other.CompareTag("Beam"))
             {
-                Destroy(other.gameObject);
+                isBeamTouching = true;
+                if (audioSource != null && beamHitSound != null)
+                    audioSource.PlayOneShot(beamHitSound);
             }
+
+            if (other.CompareTag("Bullet"))
+                Destroy(other.gameObject);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        // Stop beam contact when leaving beam area
+        if (other.CompareTag("Beam"))
+        {
+            isBeamTouching = false;
         }
     }
 
@@ -98,11 +131,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void Die()
     {
-
         CheckpointManager checkpointManager = Object.FindFirstObjectByType<CheckpointManager>();
-
-        
-
 
         if (checkpointManager != null)
         {
