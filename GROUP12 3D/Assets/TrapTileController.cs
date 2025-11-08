@@ -12,8 +12,8 @@ public class TrapTileController : MonoBehaviour
         public Material activeMaterial;
         public Material correctMaterial;
         public Material wrongMaterial;
-        public bool isActiveInPattern = false;
-        public bool isSteppedOn = false;
+        [HideInInspector] public bool isActiveInPattern = false;
+        [HideInInspector] public bool isSteppedOn = false;
     }
 
     [Header("Tile Settings")]
@@ -236,7 +236,7 @@ public class TrapTileController : MonoBehaviour
         {
             if (i < originalMaterials.Count && originalMaterials[i] != null)
             {
-                tiles[i].tileObject.GetComponent<Renderer>().material = originalMaterials[i];
+                tiles[i].tileObject.GetComponent<Renderer>().material = tiles[i].defaultMaterial;
             }
         }
     }
@@ -253,7 +253,7 @@ public class TrapTileController : MonoBehaviour
         currentPattern.Clear();
         currentStep = 0;
 
-        // Reset all tiles
+        // Reset all tiles to default material
         foreach (TileData tile in tiles)
         {
             tile.isActiveInPattern = false;
