@@ -224,10 +224,11 @@ public class FPController : MonoBehaviour
             heldObject.useGravity = true;
             heldCollider.isTrigger = false;
 
-            // Launch object away from player
+            
             heldObject.AddForce(cameraTransform.forward * throwForwardForce, ForceMode.Impulse);
             heldObject.AddForce(cameraTransform.up * throwUpwardForce, ForceMode.Impulse);
 
+           
             heldObject = null;
             heldCollider = null;
             isHolding = false;
@@ -236,4 +237,5 @@ public class FPController : MonoBehaviour
                 throwText.gameObject.SetActive(false);
         }
     }
+
 }
