@@ -1,4 +1,4 @@
-using UnityEngine;
+ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
@@ -67,10 +67,12 @@ public class FPController : MonoBehaviour
         UpdateHeldObjectPosition();
     }
 
-   
-
     private void HandleMovement()
     {
+        // Check if controller is active before moving
+        if (controller == null || !controller.enabled)
+            return;
+
         float currentSpeed = isRunning ? runSpeed : moveSpeed;
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         controller.Move(move * currentSpeed * Time.deltaTime);
@@ -91,8 +93,6 @@ public class FPController : MonoBehaviour
         cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
         transform.Rotate(Vector3.up * mouseX);
     }
-
-    
 
     public void OnMove(InputAction.CallbackContext context) => moveInput = context.ReadValue<Vector2>();
     public void OnLook(InputAction.CallbackContext context) => lookInput = context.ReadValue<Vector2>();
@@ -134,8 +134,6 @@ public class FPController : MonoBehaviour
         if (!context.performed) return;
         if (isHolding) ThrowObject();
     }
-
-    
 
     private void DetectPickupObject()
     {
@@ -224,11 +222,9 @@ public class FPController : MonoBehaviour
             heldObject.useGravity = true;
             heldCollider.isTrigger = false;
 
-            
             heldObject.AddForce(cameraTransform.forward * throwForwardForce, ForceMode.Impulse);
             heldObject.AddForce(cameraTransform.up * throwUpwardForce, ForceMode.Impulse);
 
-           
             heldObject = null;
             heldCollider = null;
             isHolding = false;
@@ -238,4 +234,14 @@ public class FPController : MonoBehaviour
         }
     }
 
+    // Add this to your FPController script
+    public void ResetPlayer()
+    {
+        // Reset movement variables
+        velocity = Vector3.zero;
+        moveInput = Vector2.zero;
+        isRunning = false;
+        
+        Debug.Log("FPController: Player reset - movement variables cleared");
+    }
 }

@@ -1,4 +1,4 @@
- using System.Collections;
+  using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,12 +13,10 @@ public class TrapTileController : MonoBehaviour
         public Material correctMaterial;
         public Material wrongMaterial;
         [HideInInspector] public bool isActiveInPattern = false;
-        [HideInInspector] public bool isSteppedOn = false;
     }
 
     [Header("Tile Settings")]
     public List<TileData> tiles = new List<TileData>();
-    public float patternDisplayTime = 3f;
     public float colorChangeDuration = 0.5f;
 
     [Header("Player Settings")]
@@ -30,8 +28,8 @@ public class TrapTileController : MonoBehaviour
     public bool showPopupOnEnter = true;
 
     [Header("Pattern Settings")]
-    public int tilesPerRow = 3; // Number of tiles in each row
-    public int startingRows = 1; // How many rows to use for the starting pattern
+    public int tilesPerRow = 3;
+    public int patternLength = 4;
 
     private List<int> currentPattern = new List<int>();
     private int currentStep = 0;
@@ -40,12 +38,13 @@ public class TrapTileController : MonoBehaviour
     private bool patternDisplaying = false;
     private bool hasShownPopup = false;
     private bool popupClosed = false;
+    private Coroutine displayPatternCoroutine;
 
     void Start()
     {
         InitializeTiles();
         
-        // Subscribe to popup closed event
+        // Subscribe to popup events
         if (popupManager != null)
         {
             popupManager.OnPopupClosed += OnPopupClosed;
@@ -54,15 +53,20 @@ public class TrapTileController : MonoBehaviour
 
     void InitializeTiles()
     {
-        // Initialize tiles and add individual tile components
+        Debug.Log($"Initializing {tiles.Count} tiles");
+
         for (int i = 0; i < tiles.Count; i++)
         {
             TileData tile = tiles[i];
-            if (tile.tileObject != null && tile.defaultMaterial != null)
+            if (tile.tileObject != null)
             {
-                tile.tileObject.GetComponent<Renderer>().material = tile.defaultMaterial;
-                
-                // Add individual tile component if not present
+                // Set default material
+                if (tile.defaultMaterial != null)
+                {
+                    tile.tileObject.GetComponent<Renderer>().material = tile.defaultMaterial;
+                }
+
+                // Add or get TrapTile component
                 TrapTile trapTile = tile.tileObject.GetComponent<TrapTile>();
                 if (trapTile == null)
                 {
@@ -70,23 +74,23 @@ public class TrapTileController : MonoBehaviour
                 }
                 trapTile.tileIndex = i;
                 trapTile.controller = this;
-            }
-        }
-    }
 
-    void OnDestroy()
-    {
-        // Unsubscribe from event to prevent memory leaks
-        if (popupManager != null)
-        {
-            popupManager.OnPopupClosed -= OnPopupClosed;
+                // Ensure collider is set up
+                Collider collider = tile.tileObject.GetComponent<Collider>();
+                if (collider == null)
+                {
+                    collider = tile.tileObject.AddComponent<BoxCollider>();
+                }
+                collider.isTrigger = true;
+
+                Debug.Log($"Initialized tile {i}: {tile.tileObject.name}");
+            }
         }
     }
 
     void Update()
     {
-        // Check for player input when pattern is active and player is in trigger
-        // Now SPACE only works after popup is closed
+        // Only allow SPACE to start pattern after popup is closed
         if (!patternActive && !patternDisplaying && playerInTrigger && popupClosed && Input.GetKeyDown(KeyCode.Space))
         {
             StartPatternSequence();
@@ -99,11 +103,12 @@ public class TrapTileController : MonoBehaviour
         {
             playerInTrigger = true;
             
+            // Only show popup if it hasn't been shown before AND we want to show it on enter
             if (!patternActive && !patternDisplaying && showPopupOnEnter && !hasShownPopup)
             {
                 ShowInstructionPopup();
                 hasShownPopup = true;
-                popupClosed = false; // Reset popup closed state
+                popupClosed = false;
             }
             else if (!patternActive && !patternDisplaying && popupClosed)
             {
@@ -144,13 +149,14 @@ public class TrapTileController : MonoBehaviour
     {
         if (patternActive || patternDisplaying) return;
 
+        Debug.Log("Starting pattern sequence...");
         patternDisplaying = true;
         popupClosed = false; // Reset for next time
-        GenerateRandomPattern();
-        StartCoroutine(DisplayPattern());
+        GenerateProgressivePattern();
+        displayPatternCoroutine = StartCoroutine(DisplayPatternCoroutine());
     }
 
-    void GenerateRandomPattern()
+    void GenerateProgressivePattern()
     {
         currentPattern.Clear();
         currentStep = 0;
@@ -161,188 +167,213 @@ public class TrapTileController : MonoBehaviour
             tile.isActiveInPattern = false;
         }
 
-        // Calculate how many starting tiles we have
-        int totalStartingTiles = tilesPerRow * startingRows;
-        
-        // Generate random pattern (3-5 tiles) only from starting rows
-        int patternLength = Random.Range(3, 6);
+        Debug.Log($"Generating progressive pattern with {patternLength} tiles");
+
+        // Start from first row and progress forward
+        int currentRow = 0;
+        List<int> availableTiles = new List<int>();
+
         for (int i = 0; i < patternLength; i++)
         {
-            int randomTileIndex;
-            do
-            {
-                // Only choose from starting tiles
-                randomTileIndex = Random.Range(0, totalStartingTiles);
-            } while (currentPattern.Contains(randomTileIndex)); // Ensure no duplicates
+            // Get available tiles for current row
+            availableTiles.Clear();
+            int rowStart = currentRow * tilesPerRow;
+            int rowEnd = Mathf.Min((currentRow + 1) * tilesPerRow, tiles.Count);
 
-            currentPattern.Add(randomTileIndex);
-            tiles[randomTileIndex].isActiveInPattern = true;
+            for (int j = rowStart; j < rowEnd; j++)
+            {
+                availableTiles.Add(j);
+            }
+
+            // If no tiles available in current row, move to next row
+            if (availableTiles.Count == 0)
+            {
+                currentRow++;
+                continue;
+            }
+
+            // Pick a random tile from current row
+            int randomIndex = Random.Range(0, availableTiles.Count);
+            int selectedTile = availableTiles[randomIndex];
+
+            currentPattern.Add(selectedTile);
+            tiles[selectedTile].isActiveInPattern = true;
+
+            Debug.Log($"Pattern step {i}: Tile {selectedTile} (Row {currentRow})");
+
+            // Move to next row for next step (can be same row or next row randomly)
+            if (Random.Range(0, 2) == 1) // 50% chance to move to next row
+            {
+                currentRow++;
+            }
+
+            // If we've run out of tiles, break
+            if (currentRow * tilesPerRow >= tiles.Count)
+            {
+                break;
+            }
         }
 
-        Debug.Log($"Pattern generated with {patternLength} tiles from first {startingRows} row(s)");
+        Debug.Log($"Generated pattern with {currentPattern.Count} tiles");
     }
 
-    IEnumerator DisplayPattern()
+    IEnumerator DisplayPatternCoroutine()
     {
+        Debug.Log("Displaying pattern...");
+
         // Disable player movement during pattern display
         FPController playerMovement = player.GetComponent<FPController>();
         if (playerMovement != null)
             playerMovement.enabled = false;
 
-        Debug.Log("Watch the pattern carefully!");
-
-        // Wait a moment before starting pattern
         yield return new WaitForSeconds(1f);
 
-        // Display the pattern with longer duration
+        // Display each tile in the pattern
         foreach (int tileIndex in currentPattern)
         {
-            yield return StartCoroutine(ChangeTileColor(tileIndex, tiles[tileIndex].activeMaterial));
-            yield return new WaitForSeconds(0.8f); // Longer pause between tiles
+            if (tileIndex < tiles.Count)
+            {
+                Debug.Log($"Showing tile {tileIndex}");
+                yield return StartCoroutine(ChangeTileColorCoroutine(tileIndex, tiles[tileIndex].activeMaterial));
+                yield return new WaitForSeconds(0.5f);
+            }
         }
 
-        // Brief pause after showing full pattern
         yield return new WaitForSeconds(0.5f);
 
-        // Enable player movement after pattern display
+        // Re-enable player movement
         if (playerMovement != null)
             playerMovement.enabled = true;
 
         patternDisplaying = false;
         patternActive = true;
-
-        Debug.Log("Pattern display complete. Step on the tiles in the correct order!");
+        Debug.Log("Pattern display complete! Step on the tiles in order.");
     }
 
-    IEnumerator ChangeTileColor(int tileIndex, Material targetMaterial)
+    IEnumerator ChangeTileColorCoroutine(int tileIndex, Material targetMaterial)
     {
+        if (tileIndex >= tiles.Count || tiles[tileIndex] == null) yield break;
+
         TileData tile = tiles[tileIndex];
         Renderer tileRenderer = tile.tileObject.GetComponent<Renderer>();
-        
+
         if (tileRenderer != null && targetMaterial != null)
         {
+            Material originalMaterial = tileRenderer.material;
             tileRenderer.material = targetMaterial;
             yield return new WaitForSeconds(colorChangeDuration);
-            
-            // Only change back to default if we're not in the middle of displaying pattern
-            if (!patternDisplaying)
-            {
-                tileRenderer.material = tile.defaultMaterial;
-            }
+            tileRenderer.material = tile.defaultMaterial;
         }
     }
 
-    // This method should be called when player steps on a tile
     public void OnTileStepped(int tileIndex)
     {
-        if (!patternActive) return;
+        Debug.Log($"Tile stepped: {tileIndex}, Pattern active: {patternActive}, Current step: {currentStep}");
 
-        TileData steppedTile = tiles[tileIndex];
+        // ANTI-CHEAT: If pattern is not active, reset player immediately
+        if (!patternActive && !patternDisplaying)
+        {
+            Debug.Log($"Cheating detected! Player stepped on tile {tileIndex} without activating pattern.");
+            StartCoroutine(FlashTileColorCoroutine(tileIndex, tiles[tileIndex].wrongMaterial));
+            ResetToStart();
+            return;
+        }
 
-        // Check if this is the correct tile in sequence
+        if (!patternActive)
+        {
+            Debug.Log("Pattern not active yet");
+            return;
+        }
+
         if (tileIndex == currentPattern[currentStep])
         {
             // Correct tile
-            StartCoroutine(FlashTileColor(tileIndex, steppedTile.correctMaterial, true));
+            Debug.Log($"Correct! Step {currentStep + 1}/{currentPattern.Count}");
+            StartCoroutine(FlashTileColorCoroutine(tileIndex, tiles[tileIndex].correctMaterial));
             currentStep++;
 
-            // Check if pattern is complete
             if (currentStep >= currentPattern.Count)
             {
                 PatternCompleted();
-            }
-            else
-            {
-                Debug.Log($"Correct! Next tile: {currentStep + 1}/{currentPattern.Count}");
             }
         }
         else
         {
             // Wrong tile
-            StartCoroutine(FlashTileColor(tileIndex, steppedTile.wrongMaterial, false));
-            ResetPattern();
+            Debug.Log($"Wrong tile! Expected {currentPattern[currentStep]}, got {tileIndex}");
+            StartCoroutine(FlashTileColorCoroutine(tileIndex, tiles[tileIndex].wrongMaterial));
+            ResetToStart();
         }
     }
 
-    IEnumerator FlashTileColor(int tileIndex, Material flashMaterial, bool isCorrect)
+    IEnumerator FlashTileColorCoroutine(int tileIndex, Material flashMaterial)
     {
+        if (tileIndex >= tiles.Count || tiles[tileIndex] == null) yield break;
+
         TileData tile = tiles[tileIndex];
         Renderer tileRenderer = tile.tileObject.GetComponent<Renderer>();
-        
+
         if (tileRenderer != null && flashMaterial != null)
         {
             Material originalMaterial = tileRenderer.material;
             tileRenderer.material = flashMaterial;
-            yield return new WaitForSeconds(0.5f);
-            
-            // Only revert to default if it's not a correct step in an active pattern
-            if (!isCorrect || !patternActive)
-            {
-                tileRenderer.material = originalMaterial;
-            }
+            yield return new WaitForSeconds(1f);
+            tileRenderer.material = originalMaterial;
         }
     }
 
     void PatternCompleted()
     {
-        Debug.Log("Pattern completed successfully! You can now cross safely.");
+        Debug.Log("Pattern completed successfully!");
         patternActive = false;
+        // Don't reset hasShownPopup here - keep it true so popup doesn't show again
+        
+        // Flash all tiles green
+        StartCoroutine(FlashAllTilesCoroutine(tiles[0].correctMaterial));
+        
         currentPattern.Clear();
         currentStep = 0;
-        hasShownPopup = false; // Reset so popup shows again if player comes back
-
-        // Optional: Make all tiles safe color for a moment
-        StartCoroutine(SuccessFlash());
-
-        // Reset all tiles
-        foreach (TileData tile in tiles)
-        {
-            tile.isActiveInPattern = false;
-        }
     }
 
-    IEnumerator SuccessFlash()
+    IEnumerator FlashAllTilesCoroutine(Material successMaterial)
     {
-        // Flash all tiles green to indicate success
         List<Material> originalMaterials = new List<Material>();
-        
+
+        // Change all tiles to success color
         foreach (TileData tile in tiles)
         {
             Renderer tileRenderer = tile.tileObject.GetComponent<Renderer>();
-            if (tileRenderer != null && tile.correctMaterial != null)
+            if (tileRenderer != null)
             {
                 originalMaterials.Add(tileRenderer.material);
-                tileRenderer.material = tile.correctMaterial;
+                tileRenderer.material = successMaterial;
             }
         }
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
 
         // Restore original materials
         for (int i = 0; i < tiles.Count; i++)
         {
-            if (i < originalMaterials.Count && originalMaterials[i] != null)
+            if (i < originalMaterials.Count)
             {
                 tiles[i].tileObject.GetComponent<Renderer>().material = tiles[i].defaultMaterial;
             }
         }
     }
 
-    void ResetPattern()
+    void ResetToStart()
     {
-        Debug.Log("Wrong tile! Resetting to start position.");
-        
-        // Reset player position
-        StartCoroutine(ResetPlayerPosition());
-        
-        // Reset pattern state
+        Debug.Log("Resetting player to start position");
         patternActive = false;
+        patternDisplaying = false;
         currentPattern.Clear();
         currentStep = 0;
-        hasShownPopup = false; // Reset so popup shows again
-        popupClosed = false; // Reset popup state
+        
+        // DON'T reset hasShownPopup - keep it true so popup doesn't show again
+        popupClosed = true; // Set popup as closed so player can immediately restart
 
-        // Reset all tiles to default material
+        // Reset all tile materials
         foreach (TileData tile in tiles)
         {
             tile.isActiveInPattern = false;
@@ -351,45 +382,75 @@ public class TrapTileController : MonoBehaviour
                 tile.tileObject.GetComponent<Renderer>().material = tile.defaultMaterial;
             }
         }
+
+        // Reset player position
+        StartCoroutine(ResetPlayerCoroutine());
     }
 
-    IEnumerator ResetPlayerPosition()
+    IEnumerator ResetPlayerCoroutine()
     {
-        // Disable player movement during reset
+        Debug.Log("Resetting player position...");
+        
+        // Disable player movement script during reset
         FPController playerMovement = player.GetComponent<FPController>();
         if (playerMovement != null)
+        {
             playerMovement.enabled = false;
+        }
 
-        // Wait a moment before resetting
         yield return new WaitForSeconds(0.5f);
-        
-        // Reset position
-        player.transform.position = startPosition.position;
-        
-        // Reset velocity if using CharacterController
+
+        // Reset position PROPERLY for CharacterController to prevent falling through ground
         CharacterController controller = player.GetComponent<CharacterController>();
         if (controller != null)
         {
-            // This helps prevent the player from carrying momentum
+            // Disable controller before changing position
             controller.enabled = false;
-            yield return null;
+            
+            // Set the transform position
+            player.transform.position = startPosition.position;
+            
+            // Re-enable controller immediately
             controller.enabled = true;
-        }
-
-        // Re-enable movement after a brief delay
-        yield return new WaitForSeconds(0.5f);
-        if (playerMovement != null)
-            playerMovement.enabled = true;
-
-        // Show popup again after reset
-        if (showPopupOnEnter)
-        {
-            ShowInstructionPopup();
+            
+            // Force a small movement to update internal controller state
+            controller.Move(Vector3.down * 0.1f);
         }
         else
         {
-            popupClosed = true;
-            Debug.Log("Ready to try again! Press SPACE to start new pattern.");
+            // Fallback if no CharacterController
+            player.transform.position = startPosition.position;
+        }
+
+        // Reset player movement variables
+        if (playerMovement != null)
+        {
+            playerMovement.ResetPlayer();
+        }
+
+        yield return new WaitForSeconds(0.3f);
+
+        // Re-enable movement
+        if (playerMovement != null)
+        {
+            playerMovement.enabled = true;
+        }
+
+        Debug.Log("Player reset to start position. Press SPACE to try again.");
+        popupClosed = true;
+    }
+
+    void OnDestroy()
+    {
+        // Unsubscribe from events
+        if (popupManager != null)
+        {
+            popupManager.OnPopupClosed -= OnPopupClosed;
+        }
+        
+        if (displayPatternCoroutine != null)
+        {
+            StopCoroutine(displayPatternCoroutine);
         }
     }
 }
