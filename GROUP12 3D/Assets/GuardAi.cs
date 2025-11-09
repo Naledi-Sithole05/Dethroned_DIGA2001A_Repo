@@ -17,20 +17,26 @@ public class GuardAI : MonoBehaviour
     private bool isActive = false;
     private Renderer[] renderers;
 
+    // Animator variables
+    private Animator animator;
+    private int isWalkingHash;
+
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         if (agent == null)
-        {
             Debug.LogError("GuardAI: Missing NavMeshAgent.");
-        }
 
-        // Get all renderers (in case the guard has multiple meshes)
+        // Get animator from parent (since it's on GuardPrefab)
+        animator = GetComponentInParent<Animator>();
+        if (animator == null)
+            Debug.LogError("GuardAI: Could not find Animator in parent.");
+
+        isWalkingHash = Animator.StringToHash("isWalking");
+
         renderers = GetComponentsInChildren<Renderer>();
-
-        // Make guard invisible at start
         SetGuardVisible(false);
-        agent.isStopped = true; // stop movement until activated
+        agent.isStopped = true;
     }
 
     void Update()
@@ -51,6 +57,11 @@ public class GuardAI : MonoBehaviour
         // Make guard visible
         SetGuardVisible(true);
 
+        // Trigger walking animation
+        if (animator != null)
+            animator.SetBool(isWalkingHash, true);
+
+        // Start patrolling
         if (waypoints.Length > 0)
         {
             currentWaypoint = 0;
@@ -92,8 +103,6 @@ public class GuardAI : MonoBehaviour
         if (renderers == null) return;
 
         foreach (Renderer rend in renderers)
-        {
             rend.enabled = visible;
-        }
     }
 }
