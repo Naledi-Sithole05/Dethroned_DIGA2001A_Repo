@@ -1,4 +1,4 @@
- using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
@@ -17,20 +17,15 @@ public class FPController : MonoBehaviour
     public float lookSensitivity = 2f;
     public float verticalLookLimit = 90f;
 
-   // [Header("Crouch Settings")]
-   // public float crouchHeight = 1f;
-   // public float standHeight = 2f;
-    //public float crouchSpeed = 2.5f;
-
     [Header("Pickup / Throw Settings")]
-    public Transform holdPoint;           // empty in front of camera
+    public Transform holdPoint;
     public float pickupRange = 3f;
     public float throwForwardForce = 10f;
     public float throwUpwardForce = 5f;
 
     [Header("UI Settings")]
-    public TMP_Text interactText;         // appears when near object
-    public TMP_Text throwText;            // appears after pickup
+    public TMP_Text interactText;
+    public TMP_Text throwText;
 
     private CharacterController controller;
     private Vector2 moveInput;
@@ -40,7 +35,6 @@ public class FPController : MonoBehaviour
 
     private float defaultMoveSpeed;
     private bool isRunning;
-    private bool isCrouching;
 
     // Pickup
     private Rigidbody heldObject;
@@ -69,7 +63,6 @@ public class FPController : MonoBehaviour
 
     private void HandleMovement()
     {
-        // Check if controller is active before moving
         if (controller == null || !controller.enabled)
             return;
 
@@ -102,22 +95,6 @@ public class FPController : MonoBehaviour
         if (context.performed && controller.isGrounded)
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity) * jumpSpeedMultiplier;
     }
-
-   // public void OnCrouch(InputAction.CallbackContext context)
-   // {
-      //  if (context.performed)
-      //  {
-          //  isCrouching = true;
-       //     controller.height = crouchHeight;
-      //      moveSpeed = crouchSpeed;
-    //    }
-   //     else if (context.canceled)
-    //    {
-   //         isCrouching = false;
-   //         controller.height = standHeight;
-    //        moveSpeed = defaultMoveSpeed;
-  //      }
-  //  }
 
     public void OnPickUp(InputAction.CallbackContext context)
     {
@@ -164,24 +141,28 @@ public class FPController : MonoBehaviour
 
         heldObject = nearestObject.GetComponent<Rigidbody>();
         heldCollider = nearestObject.GetComponent<Collider>();
+
         if (heldObject != null && heldCollider != null)
         {
             isHolding = true;
 
-            // Disable gravity, keep Rigidbody non-kinematic
+            // Disable gravity
             heldObject.useGravity = false;
 
-            // Reset velocities safely
-            heldObject.linearVelocity = Vector3.zero;
-            heldObject.angularVelocity = Vector3.zero;
+            // Reset velocity safely (only if not kinematic)
+            if (!heldObject.isKinematic)
+            {
+                heldObject.linearVelocity = Vector3.zero;
+                heldObject.angularVelocity = Vector3.zero;
+            }
 
-            // Make collider a trigger
+            // Make collider a trigger while held
             heldCollider.isTrigger = true;
 
-            // Show throw text
+            // Update UI
             if (throwText != null)
             {
-                throwText.text = "Press 'G' to throw or the North Button";
+                throwText.text = "Press 'G' to Put Down or the North Button";
                 throwText.gameObject.SetActive(true);
             }
 
@@ -194,7 +175,7 @@ public class FPController : MonoBehaviour
     {
         if (isHolding && heldObject != null)
         {
-            // Smoothly move in front of camera without parenting
+            // Smoothly move object toward hold point
             heldObject.MovePosition(Vector3.Lerp(heldObject.position, holdPoint.position, Time.deltaTime * 10f));
             heldObject.MoveRotation(Quaternion.Lerp(heldObject.rotation, holdPoint.rotation, Time.deltaTime * 10f));
         }
@@ -222,8 +203,12 @@ public class FPController : MonoBehaviour
             heldObject.useGravity = true;
             heldCollider.isTrigger = false;
 
-            heldObject.AddForce(cameraTransform.forward * throwForwardForce, ForceMode.Impulse);
-            heldObject.AddForce(cameraTransform.up * throwUpwardForce, ForceMode.Impulse);
+            // Only apply forces if Rigidbody is not kinematic
+            if (!heldObject.isKinematic)
+            {
+                heldObject.AddForce(cameraTransform.forward * throwForwardForce, ForceMode.Impulse);
+                heldObject.AddForce(cameraTransform.up * throwUpwardForce, ForceMode.Impulse);
+            }
 
             heldObject = null;
             heldCollider = null;
@@ -234,14 +219,11 @@ public class FPController : MonoBehaviour
         }
     }
 
-    // Add this to your FPController script
     public void ResetPlayer()
     {
-        // Reset movement variables
         velocity = Vector3.zero;
         moveInput = Vector2.zero;
         isRunning = false;
-        
         Debug.Log("FPController: Player reset - movement variables cleared");
     }
 }
