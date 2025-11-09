@@ -25,33 +25,69 @@ public class TrapTileController : MonoBehaviour
     public GameObject player;
     public Transform startPosition;
 
-    [Header("Instructions")]
-    public bool showInstructions = true;
-    public string instructionMessage = "Watch the pattern! Press SPACE to start.";
+    [Header("Popup System")]
+    public PopupManager popupManager;
+    public bool showPopupOnEnter = true;
+
+    [Header("Pattern Settings")]
+    public int tilesPerRow = 3; // Number of tiles in each row
+    public int startingRows = 1; // How many rows to use for the starting pattern
 
     private List<int> currentPattern = new List<int>();
     private int currentStep = 0;
     private bool patternActive = false;
     private bool playerInTrigger = false;
     private bool patternDisplaying = false;
-    private bool hasShownInstructions = false;
+    private bool hasShownPopup = false;
+    private bool popupClosed = false;
 
     void Start()
     {
-        // Initialize tiles
-        foreach (TileData tile in tiles)
+        InitializeTiles();
+        
+        // Subscribe to popup closed event
+        if (popupManager != null)
         {
+            popupManager.OnPopupClosed += OnPopupClosed;
+        }
+    }
+
+    void InitializeTiles()
+    {
+        // Initialize tiles and add individual tile components
+        for (int i = 0; i < tiles.Count; i++)
+        {
+            TileData tile = tiles[i];
             if (tile.tileObject != null && tile.defaultMaterial != null)
             {
                 tile.tileObject.GetComponent<Renderer>().material = tile.defaultMaterial;
+                
+                // Add individual tile component if not present
+                TrapTile trapTile = tile.tileObject.GetComponent<TrapTile>();
+                if (trapTile == null)
+                {
+                    trapTile = tile.tileObject.AddComponent<TrapTile>();
+                }
+                trapTile.tileIndex = i;
+                trapTile.controller = this;
             }
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Unsubscribe from event to prevent memory leaks
+        if (popupManager != null)
+        {
+            popupManager.OnPopupClosed -= OnPopupClosed;
         }
     }
 
     void Update()
     {
         // Check for player input when pattern is active and player is in trigger
-        if (!patternActive && !patternDisplaying && playerInTrigger && Input.GetKeyDown(KeyCode.Space))
+        // Now SPACE only works after popup is closed
+        if (!patternActive && !patternDisplaying && playerInTrigger && popupClosed && Input.GetKeyDown(KeyCode.Space))
         {
             StartPatternSequence();
         }
@@ -63,12 +99,13 @@ public class TrapTileController : MonoBehaviour
         {
             playerInTrigger = true;
             
-            if (!patternActive && !patternDisplaying && showInstructions && !hasShownInstructions)
+            if (!patternActive && !patternDisplaying && showPopupOnEnter && !hasShownPopup)
             {
-                ShowInstructions();
-                hasShownInstructions = true;
+                ShowInstructionPopup();
+                hasShownPopup = true;
+                popupClosed = false; // Reset popup closed state
             }
-            else if (!patternActive && !patternDisplaying)
+            else if (!patternActive && !patternDisplaying && popupClosed)
             {
                 Debug.Log("Press SPACE to start the pattern sequence");
             }
@@ -83,12 +120,24 @@ public class TrapTileController : MonoBehaviour
         }
     }
 
-    void ShowInstructions()
+    void OnPopupClosed()
     {
-        Debug.Log("Watch carefully! The tiles will light up in a pattern. Remember the sequence and step on them in the correct order. Press SPACE to start when you're ready.");
-        
-        // You can also show on-screen text here if you want
-        // StartCoroutine(ShowTemporaryMessage(instructionMessage, 5f));
+        popupClosed = true;
+        Debug.Log("Popup closed. Press SPACE to start the pattern when you're ready.");
+    }
+
+    void ShowInstructionPopup()
+    {
+        if (popupManager != null)
+        {
+            popupManager.ShowPatternMessage();
+        }
+        else
+        {
+            // Fallback to console message
+            Debug.Log("Watch carefully! The tiles will light up in a pattern. Remember the sequence and step on them in the correct order. Press SPACE to start when you're ready.");
+            popupClosed = true; // If no popup manager, allow immediate start
+        }
     }
 
     public void StartPatternSequence()
@@ -96,6 +145,7 @@ public class TrapTileController : MonoBehaviour
         if (patternActive || patternDisplaying) return;
 
         patternDisplaying = true;
+        popupClosed = false; // Reset for next time
         GenerateRandomPattern();
         StartCoroutine(DisplayPattern());
     }
@@ -111,21 +161,25 @@ public class TrapTileController : MonoBehaviour
             tile.isActiveInPattern = false;
         }
 
-        // Generate random pattern (3-5 tiles)
+        // Calculate how many starting tiles we have
+        int totalStartingTiles = tilesPerRow * startingRows;
+        
+        // Generate random pattern (3-5 tiles) only from starting rows
         int patternLength = Random.Range(3, 6);
         for (int i = 0; i < patternLength; i++)
         {
             int randomTileIndex;
             do
             {
-                randomTileIndex = Random.Range(0, tiles.Count);
+                // Only choose from starting tiles
+                randomTileIndex = Random.Range(0, totalStartingTiles);
             } while (currentPattern.Contains(randomTileIndex)); // Ensure no duplicates
 
             currentPattern.Add(randomTileIndex);
             tiles[randomTileIndex].isActiveInPattern = true;
         }
 
-        Debug.Log($"Pattern generated with {patternLength} tiles");
+        Debug.Log($"Pattern generated with {patternLength} tiles from first {startingRows} row(s)");
     }
 
     IEnumerator DisplayPattern()
@@ -140,11 +194,11 @@ public class TrapTileController : MonoBehaviour
         // Wait a moment before starting pattern
         yield return new WaitForSeconds(1f);
 
-        // Display the pattern
+        // Display the pattern with longer duration
         foreach (int tileIndex in currentPattern)
         {
             yield return StartCoroutine(ChangeTileColor(tileIndex, tiles[tileIndex].activeMaterial));
-            yield return new WaitForSeconds(0.5f); // Pause between tiles
+            yield return new WaitForSeconds(0.8f); // Longer pause between tiles
         }
 
         // Brief pause after showing full pattern
@@ -169,7 +223,12 @@ public class TrapTileController : MonoBehaviour
         {
             tileRenderer.material = targetMaterial;
             yield return new WaitForSeconds(colorChangeDuration);
-            tileRenderer.material = tile.defaultMaterial;
+            
+            // Only change back to default if we're not in the middle of displaying pattern
+            if (!patternDisplaying)
+            {
+                tileRenderer.material = tile.defaultMaterial;
+            }
         }
     }
 
@@ -184,7 +243,7 @@ public class TrapTileController : MonoBehaviour
         if (tileIndex == currentPattern[currentStep])
         {
             // Correct tile
-            StartCoroutine(FlashTileColor(tileIndex, steppedTile.correctMaterial));
+            StartCoroutine(FlashTileColor(tileIndex, steppedTile.correctMaterial, true));
             currentStep++;
 
             // Check if pattern is complete
@@ -200,12 +259,12 @@ public class TrapTileController : MonoBehaviour
         else
         {
             // Wrong tile
-            StartCoroutine(FlashTileColor(tileIndex, steppedTile.wrongMaterial));
+            StartCoroutine(FlashTileColor(tileIndex, steppedTile.wrongMaterial, false));
             ResetPattern();
         }
     }
 
-    IEnumerator FlashTileColor(int tileIndex, Material flashMaterial)
+    IEnumerator FlashTileColor(int tileIndex, Material flashMaterial, bool isCorrect)
     {
         TileData tile = tiles[tileIndex];
         Renderer tileRenderer = tile.tileObject.GetComponent<Renderer>();
@@ -215,7 +274,12 @@ public class TrapTileController : MonoBehaviour
             Material originalMaterial = tileRenderer.material;
             tileRenderer.material = flashMaterial;
             yield return new WaitForSeconds(0.5f);
-            tileRenderer.material = originalMaterial;
+            
+            // Only revert to default if it's not a correct step in an active pattern
+            if (!isCorrect || !patternActive)
+            {
+                tileRenderer.material = originalMaterial;
+            }
         }
     }
 
@@ -225,7 +289,7 @@ public class TrapTileController : MonoBehaviour
         patternActive = false;
         currentPattern.Clear();
         currentStep = 0;
-        hasShownInstructions = false; // Reset so instructions show again if player comes back
+        hasShownPopup = false; // Reset so popup shows again if player comes back
 
         // Optional: Make all tiles safe color for a moment
         StartCoroutine(SuccessFlash());
@@ -275,7 +339,8 @@ public class TrapTileController : MonoBehaviour
         patternActive = false;
         currentPattern.Clear();
         currentStep = 0;
-        hasShownInstructions = false; // Reset so instructions show again
+        hasShownPopup = false; // Reset so popup shows again
+        popupClosed = false; // Reset popup state
 
         // Reset all tiles to default material
         foreach (TileData tile in tiles)
@@ -316,23 +381,15 @@ public class TrapTileController : MonoBehaviour
         if (playerMovement != null)
             playerMovement.enabled = true;
 
-        // Show instructions again after reset
-        if (showInstructions)
+        // Show popup again after reset
+        if (showPopupOnEnter)
         {
-            ShowInstructions();
+            ShowInstructionPopup();
         }
         else
         {
+            popupClosed = true;
             Debug.Log("Ready to try again! Press SPACE to start new pattern.");
         }
-    }
-
-    // Optional: Method to show temporary on-screen message
-    private IEnumerator ShowTemporaryMessage(string message, float duration)
-    {
-        // You can implement GUI drawing here if needed
-        Debug.Log(message);
-        yield return new WaitForSeconds(duration);
-        // Hide message logic here
     }
 }
