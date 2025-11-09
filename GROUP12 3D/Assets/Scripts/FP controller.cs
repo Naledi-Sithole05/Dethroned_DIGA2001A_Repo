@@ -17,10 +17,10 @@ public class FPController : MonoBehaviour
     public float lookSensitivity = 2f;
     public float verticalLookLimit = 90f;
 
-    [Header("Crouch Settings")]
-    public float crouchHeight = 1f;
-    public float standHeight = 2f;
-    public float crouchSpeed = 2.5f;
+   // [Header("Crouch Settings")]
+   // public float crouchHeight = 1f;
+   // public float standHeight = 2f;
+    //public float crouchSpeed = 2.5f;
 
     [Header("Pickup / Throw Settings")]
     public Transform holdPoint;           // empty in front of camera
@@ -103,21 +103,21 @@ public class FPController : MonoBehaviour
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity) * jumpSpeedMultiplier;
     }
 
-    public void OnCrouch(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            isCrouching = true;
-            controller.height = crouchHeight;
-            moveSpeed = crouchSpeed;
-        }
-        else if (context.canceled)
-        {
-            isCrouching = false;
-            controller.height = standHeight;
-            moveSpeed = defaultMoveSpeed;
-        }
-    }
+   // public void OnCrouch(InputAction.CallbackContext context)
+   // {
+      //  if (context.performed)
+      //  {
+          //  isCrouching = true;
+       //     controller.height = crouchHeight;
+      //      moveSpeed = crouchSpeed;
+    //    }
+   //     else if (context.canceled)
+    //    {
+   //         isCrouching = false;
+   //         controller.height = standHeight;
+    //        moveSpeed = defaultMoveSpeed;
+  //      }
+  //  }
 
     public void OnPickUp(InputAction.CallbackContext context)
     {
