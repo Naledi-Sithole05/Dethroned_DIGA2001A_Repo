@@ -1,4 +1,4 @@
-using UnityEngine;
+ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
@@ -36,7 +36,17 @@ public class GuardAI : MonoBehaviour
 
         renderers = GetComponentsInChildren<Renderer>();
         SetGuardVisible(false);
-        agent.isStopped = true;
+        
+        // Don't set isStopped here - wait for Start or activation
+    }
+
+    void Start()
+    {
+        // Initialize agent state in Start instead of Awake
+        if (agent != null && agent.isActiveAndEnabled)
+        {
+            agent.isStopped = true;
+        }
     }
 
     void Update()
@@ -52,7 +62,12 @@ public class GuardAI : MonoBehaviour
         if (agent == null) return;
 
         isActive = true;
-        agent.isStopped = false;
+        
+        // Only set isStopped if agent is properly placed on NavMesh
+        if (agent.isOnNavMesh)
+        {
+            agent.isStopped = false;
+        }
 
         // Make guard visible
         SetGuardVisible(true);
@@ -62,18 +77,18 @@ public class GuardAI : MonoBehaviour
             animator.SetBool(isWalkingHash, true);
 
         // Start patrolling
-        if (waypoints.Length > 0)
+        if (waypoints.Length > 0 && agent.isOnNavMesh)
         {
             currentWaypoint = 0;
             agent.SetDestination(waypoints[currentWaypoint].position);
         }
 
-        Debug.Log("Guard activated — starting patrol.");
+        Debug.Log("Guard activated - starting patrol.");
     }
 
     void Patrol()
     {
-        if (waypoints.Length == 0 || agent == null) return;
+        if (waypoints.Length == 0 || agent == null || !agent.isOnNavMesh) return;
 
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
