@@ -23,6 +23,7 @@ TagManager:
   - Pit
   - CheckPoint
   - Checkpoint
+  - KeyPad
   layers:
   - Default
   - TransparentFX
