@@ -1,4 +1,4 @@
-  using System.Collections;
+   using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,6 +31,10 @@ public class TrapTileController : MonoBehaviour
     public int tilesPerRow = 3;
     public int patternLength = 4;
 
+    [Header("Trap Deactivation")]
+    public GameObject trapObstacle; // Optional: obstacle that blocks the path
+    public Collider trapTrigger; // The trigger that activates this trap
+
     private List<int> currentPattern = new List<int>();
     private int currentStep = 0;
     private bool patternActive = false;
@@ -38,6 +42,7 @@ public class TrapTileController : MonoBehaviour
     private bool patternDisplaying = false;
     private bool hasShownPopup = false;
     private bool popupClosed = false;
+    private bool patternCompleted = false; // NEW: Track if pattern was completed
     private Coroutine displayPatternCoroutine;
 
     void Start()
@@ -90,8 +95,8 @@ public class TrapTileController : MonoBehaviour
 
     void Update()
     {
-        // Only allow SPACE to start pattern after popup is closed
-        if (!patternActive && !patternDisplaying && playerInTrigger && popupClosed && Input.GetKeyDown(KeyCode.Space))
+        // Only allow SPACE to start pattern after popup is closed AND pattern not completed
+        if (!patternCompleted && !patternActive && !patternDisplaying && playerInTrigger && popupClosed && Input.GetKeyDown(KeyCode.Space))
         {
             StartPatternSequence();
         }
@@ -102,6 +107,13 @@ public class TrapTileController : MonoBehaviour
         if (other.gameObject == player)
         {
             playerInTrigger = true;
+            
+            // If pattern already completed, let player pass through
+            if (patternCompleted)
+            {
+                Debug.Log("Trap already completed - player can pass freely");
+                return;
+            }
             
             // Only show popup if it hasn't been shown before AND we want to show it on enter
             if (!patternActive && !patternDisplaying && showPopupOnEnter && !hasShownPopup)
@@ -147,7 +159,7 @@ public class TrapTileController : MonoBehaviour
 
     public void StartPatternSequence()
     {
-        if (patternActive || patternDisplaying) return;
+        if (patternActive || patternDisplaying || patternCompleted) return;
 
         Debug.Log("Starting pattern sequence...");
         patternDisplaying = true;
@@ -270,6 +282,13 @@ public class TrapTileController : MonoBehaviour
     {
         Debug.Log($"Tile stepped: {tileIndex}, Pattern active: {patternActive}, Current step: {currentStep}");
 
+        // If pattern already completed, ignore tile steps
+        if (patternCompleted)
+        {
+            Debug.Log("Pattern already completed - tiles are now safe to walk on");
+            return;
+        }
+
         // ANTI-CHEAT: If pattern is not active, reset player immediately
         if (!patternActive && !patternDisplaying)
         {
@@ -318,7 +337,12 @@ public class TrapTileController : MonoBehaviour
             Material originalMaterial = tileRenderer.material;
             tileRenderer.material = flashMaterial;
             yield return new WaitForSeconds(1f);
-            tileRenderer.material = originalMaterial;
+            
+            // After completion, tiles stay in default state (safe to walk on)
+            if (!patternCompleted)
+            {
+                tileRenderer.material = originalMaterial;
+            }
         }
     }
 
@@ -326,10 +350,15 @@ public class TrapTileController : MonoBehaviour
     {
         Debug.Log("Pattern completed successfully!");
         patternActive = false;
+        patternCompleted = true; // NEW: Mark as permanently completed
+        
         // Don't reset hasShownPopup here - keep it true so popup doesn't show again
         
-        // Flash all tiles green
+        // Flash all tiles green and keep them green
         StartCoroutine(FlashAllTilesCoroutine(tiles[0].correctMaterial));
+        
+        // Deactivate trap obstacles if any
+        DeactivateTrapObstacles();
         
         currentPattern.Clear();
         currentStep = 0;
@@ -352,18 +381,54 @@ public class TrapTileController : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
 
-        // Restore original materials
-        for (int i = 0; i < tiles.Count; i++)
+        // NEW: After completion, tiles stay in success state to indicate they're safe
+        if (patternCompleted)
         {
-            if (i < originalMaterials.Count)
+            // Keep the success color permanently
+            foreach (TileData tile in tiles)
             {
-                tiles[i].tileObject.GetComponent<Renderer>().material = tiles[i].defaultMaterial;
+                Renderer tileRenderer = tile.tileObject.GetComponent<Renderer>();
+                if (tileRenderer != null && tile.correctMaterial != null)
+                {
+                    tileRenderer.material = tile.correctMaterial;
+                }
             }
+        }
+        else
+        {
+            // Restore original materials (if somehow not completed)
+            for (int i = 0; i < tiles.Count; i++)
+            {
+                if (i < originalMaterials.Count)
+                {
+                    tiles[i].tileObject.GetComponent<Renderer>().material = tiles[i].defaultMaterial;
+                }
+            }
+        }
+    }
+
+    void DeactivateTrapObstacles()
+    {
+        // Deactivate physical obstacles if assigned
+        if (trapObstacle != null)
+        {
+            trapObstacle.SetActive(false);
+            Debug.Log("Trap obstacle deactivated");
+        }
+
+        // Disable the trigger so it doesn't activate again
+        if (trapTrigger != null)
+        {
+            trapTrigger.enabled = false;
+            Debug.Log("Trap trigger disabled");
         }
     }
 
     void ResetToStart()
     {
+        // Don't reset if pattern is already completed
+        if (patternCompleted) return;
+
         Debug.Log("Resetting player to start position");
         patternActive = false;
         patternDisplaying = false;
@@ -373,13 +438,16 @@ public class TrapTileController : MonoBehaviour
         // DON'T reset hasShownPopup - keep it true so popup doesn't show again
         popupClosed = true; // Set popup as closed so player can immediately restart
 
-        // Reset all tile materials
-        foreach (TileData tile in tiles)
+        // Reset all tile materials (only if not completed)
+        if (!patternCompleted)
         {
-            tile.isActiveInPattern = false;
-            if (tile.tileObject != null && tile.defaultMaterial != null)
+            foreach (TileData tile in tiles)
             {
-                tile.tileObject.GetComponent<Renderer>().material = tile.defaultMaterial;
+                tile.isActiveInPattern = false;
+                if (tile.tileObject != null && tile.defaultMaterial != null)
+                {
+                    tile.tileObject.GetComponent<Renderer>().material = tile.defaultMaterial;
+                }
             }
         }
 
