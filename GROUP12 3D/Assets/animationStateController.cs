@@ -34,12 +34,12 @@ public class animationStateController : MonoBehaviour
 
         }
 
-        if  (jumpPressed)
+        if (_Player.isGrounded)
         {
           animator.SetBool (isJumpingHash, true);
         }
 
-        if (_Player.isGrounded)
+        if (!_Player.isGrounded)
         {
             animator.SetBool(isJumpingHash, false);
         }
