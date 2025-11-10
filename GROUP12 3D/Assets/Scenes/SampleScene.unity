@@ -437019,7 +437019,7 @@ MonoBehaviour:
   closeButton: {fileID: 831188453}
   patternMessage: Lets see if you remember your ways around your castle. Watch the
     pattern carefully and follow each step. Press SPACE TO START THE PATTEN
-  autoCloseTime: 10
+  autoCloseTime: 8
   enableClickToClose: 1
 --- !u!1 &1392429679
 GameObject:
