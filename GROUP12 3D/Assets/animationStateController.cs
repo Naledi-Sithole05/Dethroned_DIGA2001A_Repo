@@ -6,7 +6,8 @@ public class animationStateController : MonoBehaviour
     public CharacterController _Player;
     int isWalkingHash;
     int isJumpingHash;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    bool jumpStarted = false;
+
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -14,38 +15,30 @@ public class animationStateController : MonoBehaviour
         isJumpingHash = Animator.StringToHash("isJumping");
     }
 
-    // Update is called once per frame
     void Update()
     {
-        bool isWalking = animator.GetBool(isWalkingHash);
-        bool isJumping = animator.GetBool(isJumpingHash);
         bool forwardPressed = Input.GetKey("w");
-        bool jumpPressed = Input.GetKey("space");
+        bool jumpPressed = Input.GetKeyDown("space");
+        bool isGrounded = _Player.isGrounded;
 
-        if (!isWalking && forwardPressed)
+        // Walking logic
+        animator.SetBool(isWalkingHash, forwardPressed);
+
+        // Jump trigger
+        if (jumpPressed && isGrounded)
         {
-            animator.SetBool(isWalkingHash, true);
-
+            animator.SetBool(isJumpingHash, true);
+            jumpStarted = true;
         }
 
-        if (isWalking && !forwardPressed)
-        {
-            animator.SetBool(isWalkingHash, false);
-
-        }
-
-        if  (jumpPressed)
-        {
-          animator.SetBool (isJumpingHash, true);
-        }
-
-        if (_Player.isGrounded)
+        // Reset jump only when character lands
+        if (jumpStarted && isGrounded)
         {
             animator.SetBool(isJumpingHash, false);
+            jumpStarted = false;
         }
-
-
     }
-
 }
+
+
 
